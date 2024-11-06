@@ -36,15 +36,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 abstract class AbstractSolrService
 {
     protected static array $pingCache = [];
-
     protected TypoScriptConfiguration $configuration;
-
     protected SolrLogManager $logger;
-
     protected Client $client;
 
-    public function __construct(Client $client, $typoScriptConfiguration = null, $logManager = null)
-    {
+    public function __construct(
+        Client $client,
+        TypoScriptConfiguration $typoScriptConfiguration = null,
+        SolrLogManager $logManager = null,
+    ) {
         $this->client = $client;
         $this->configuration = $typoScriptConfiguration ?? Util::getSolrConfiguration();
         $this->logger = $logManager ?? GeneralUtility::makeInstance(SolrLogManager::class, __CLASS__);
@@ -87,7 +87,7 @@ abstract class AbstractSolrService
             return $endpoint->getCoreBaseUri();
         } catch (Throwable) {
         }
-        return  $endpoint->getScheme() . '://' . $endpoint->getHost() . ':' . $endpoint->getPort() . $endpoint->getPath() . '/' . $endpoint->getCore() . '/';
+        return $endpoint->getScheme() . '://' . $endpoint->getHost() . ':' . $endpoint->getPort() . $endpoint->getPath() . '/' . $endpoint->getCore() . '/';
     }
 
     public function getPrimaryEndpoint(): Endpoint

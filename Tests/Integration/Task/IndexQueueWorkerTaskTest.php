@@ -19,12 +19,11 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\Task\IndexQueueWorkerTask;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * TestCase to check if we can index from index queue worker task into a solr server
- *
- * @author Timo Schmidt
  */
 class IndexQueueWorkerTaskTest extends IntegrationTestBase
 {
@@ -47,10 +46,8 @@ class IndexQueueWorkerTaskTest extends IntegrationTestBase
         $this->writeDefaultSolrTestSiteConfiguration();
     }
 
-    /**
-     * @test
-     */
-    public function canGetAdditionalInformationFromTask()
+    #[Test]
+    public function canGetAdditionalInformationFromTask(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_trigger_frontend_calls_for_page_index.csv');
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);

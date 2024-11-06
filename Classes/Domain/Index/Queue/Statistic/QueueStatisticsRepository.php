@@ -19,7 +19,6 @@ namespace ApacheSolrForTypo3\Solr\Domain\Index\Queue\Statistic;
 
 use ApacheSolrForTypo3\Solr\System\Records\AbstractRepository;
 use Doctrine\DBAL\Exception as DBALException;
-use PDO;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnsupportedMethodException;
 
@@ -47,19 +46,22 @@ class QueueStatisticsRepository extends AbstractRepository
     ): QueueStatistic {
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder
-            ->add('select', vsprintf('(%s < %s) AS %s', [
-                $queryBuilder->quoteIdentifier($this->columnIndexed),
-                $queryBuilder->quoteIdentifier($this->columnChanged),
-                $queryBuilder->quoteIdentifier('pending'),
-            ]), true)
-            ->add('select', vsprintf('(%s) AS %s', [
-                $queryBuilder->expr()->notLike($this->columnErrors, $queryBuilder->createNamedParameter('')),
-                $queryBuilder->quoteIdentifier('failed'),
-            ]), true)
-            ->add('select', $queryBuilder->expr()->count('*', 'count'), true)
+            ->getConcreteQueryBuilder()
+            ->select(
+                vsprintf('(%s < %s) AS %s', [
+                    $queryBuilder->quoteIdentifier($this->columnIndexed),
+                    $queryBuilder->quoteIdentifier($this->columnChanged),
+                    $queryBuilder->quoteIdentifier('pending'),
+                ]),
+                vsprintf('(%s) AS %s', [
+                    $queryBuilder->expr()->notLike($this->columnErrors, $queryBuilder->createNamedParameter('')),
+                    $queryBuilder->quoteIdentifier('failed'),
+                ]),
+                $queryBuilder->expr()->count('*', 'count')
+            )
             ->from($this->table)
             ->where(
-                $queryBuilder->expr()->eq($this->columnRootpage, $queryBuilder->createNamedParameter($rootPid, PDO::PARAM_INT))
+                $queryBuilder->expr()->eq($this->columnRootpage, $queryBuilder->createNamedParameter($rootPid, \Doctrine\DBAL\ParameterType::INTEGER))
             )->groupBy('pending', 'failed');
 
         if (!empty($indexingConfigurationName)) {

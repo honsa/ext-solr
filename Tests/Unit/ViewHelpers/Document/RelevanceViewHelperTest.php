@@ -19,17 +19,13 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResult;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Document\RelevanceViewHelper;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class RelevanceViewHelperTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canCalculateRelevance()
+    #[Test]
+    public function canCalculateRelevance(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $resultSetMock->expects(self::any())->method('getMaximumScore')->willReturn(5.5);
@@ -42,15 +38,17 @@ class RelevanceViewHelperTest extends SetUpUnitTestCase
             'document' => $documentMock,
         ];
         $renderingContextMock = $this->createMock(RenderingContextInterface::class);
-        $score = RelevanceViewHelper::renderStatic($arguments, function () {}, $renderingContextMock);
+
+        $relevanceViewHelperTestable = new RelevanceViewHelper();
+        $relevanceViewHelperTestable->setRenderingContext($renderingContextMock);
+        $relevanceViewHelperTestable->setArguments($arguments);
+        $score = $relevanceViewHelperTestable->render();
 
         self::assertEquals(10.0, $score, 'Unexpected score');
     }
 
-    /**
-     * @test
-     */
-    public function canCalculateRelevanceFromPassedMaximumScore()
+    #[Test]
+    public function canCalculateRelevanceFromPassedMaximumScore(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $resultSetMock->expects(self::never())->method('getMaximumScore');
@@ -64,7 +62,10 @@ class RelevanceViewHelperTest extends SetUpUnitTestCase
             'maximumScore' => 11,
         ];
         $renderingContextMock = $this->createMock(RenderingContextInterface::class);
-        $score = RelevanceViewHelper::renderStatic($arguments, function () {}, $renderingContextMock);
+        $relevanceViewHelperTestable = new RelevanceViewHelper();
+        $relevanceViewHelperTestable->setRenderingContext($renderingContextMock);
+        $relevanceViewHelperTestable->setArguments($arguments);
+        $score = $relevanceViewHelperTestable->render();
 
         self::assertEquals(5.0, $score, 'Unexpected score');
     }

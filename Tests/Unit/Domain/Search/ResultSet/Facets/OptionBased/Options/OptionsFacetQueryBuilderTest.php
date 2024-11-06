@@ -18,19 +18,17 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Opti
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\OptionsFacetQueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 
 /**
  * Testcase for the dateRange queryBuilder
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canBuildSortParameter()
+    #[Test]
+    public function canBuildSortParameter(): void
     {
         /**
          * sortBy = index
@@ -69,10 +67,8 @@ class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuildLimitParameter()
+    #[Test]
+    public function canBuildLimitParameter(): void
     {
         /**
          * limit 20
@@ -105,10 +101,8 @@ class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuildLimitParameterFromGlobalSetting()
+    #[Test]
+    public function canBuildLimitParameterFromGlobalSetting(): void
     {
         /**
          * limit
@@ -144,10 +138,8 @@ class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuildMincountParameter()
+    #[Test]
+    public function canBuildMincountParameter(): void
     {
         /**
          * mincount = 2
@@ -187,11 +179,9 @@ class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
         yield ['configuredMinimumCount' => null, 'expectedMinimumCount' => 1];
     }
 
-    /**
-     * @dataProvider getGlobalMinimumCountValue
-     * @test
-     */
-    public function canBuildMincountParameterFromGlobalSetting($configuredMinimumCount, $expectedMinimumCount)
+    #[DataProvider('getGlobalMinimumCountValue')]
+    #[Test]
+    public function canBuildMincountParameterFromGlobalSetting($configuredMinimumCount, $expectedMinimumCount): void
     {
         /**
          * mincount = 2
@@ -227,10 +217,8 @@ class OptionsFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuildMetricsParameter()
+    #[Test]
+    public function canBuildMetricsParameter(): void
     {
         /**
          * metrics {

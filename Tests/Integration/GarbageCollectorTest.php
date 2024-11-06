@@ -22,6 +22,7 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\IndexQueue\RecordMonitor;
 use ApacheSolrForTypo3\Solr\System\Records\Queue\EventQueueItemRepository;
 use ApacheSolrForTypo3\Solr\Task\EventQueueWorkerTask;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
@@ -34,8 +35,6 @@ use TYPO3\CMS\Scheduler\Scheduler;
 /**
  * This testcase is used to check if the GarbageCollector can delete garbage from the
  * solr server as expected
- *
- * @author Timo Schmidt
  */
 class GarbageCollectorTest extends IntegrationTestBase
 {
@@ -48,41 +47,13 @@ class GarbageCollectorTest extends IntegrationTestBase
         '../vendor/apache-solr-for-typo3/solr/Tests/Integration/Fixtures/Extensions/fake_extension',
     ];
 
-    /**
-     * @var RecordMonitor
-     */
-    protected $recordMonitor;
-
-    /**
-     * @var DataHandler
-     */
-    protected $dataHandler;
-
-    /**
-     * @var Queue
-     */
-    protected $indexQueue;
-
-    /**
-     * @var GarbageCollector
-     */
-    protected $garbageCollector;
-
-    /**
-     * @var Indexer
-     */
-    protected $indexer;
-
-    /**
-     * @var ExtensionConfiguration
-     */
-    protected $extensionConfiguration;
-
-    /**
-     * @var EventQueueItemRepository
-     */
-    protected $eventQueue;
-
+    protected RecordMonitor $recordMonitor;
+    protected DataHandler $dataHandler;
+    protected Queue $indexQueue;
+    protected GarbageCollector $garbageCollector;
+    protected Indexer $indexer;
+    protected ExtensionConfiguration $extensionConfiguration;
+    protected EventQueueItemRepository $eventQueue;
     protected BackendUserAuthentication $backendUser;
 
     protected function setUp(): void
@@ -167,9 +138,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function queueItemStaysWhenOverlayIsSetToHidden(): void
     {
         $this->prepareQueueItemStaysWhenOverlayIsSetToHidden();
@@ -178,9 +147,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertIndexQueueContainsItemAmount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function queueItemStaysWhenOverlayIsSetToHiddenInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -205,9 +172,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->garbageCollector->processDatamap_afterDatabaseOperations('update', 'pages', 2, ['hidden' => 1], $this->dataHandler);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canQueueAPageAndRemoveItWithTheGarbageCollector(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/subpage.csv');
@@ -227,9 +192,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyIndexQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSet(): void
     {
         $this->prepareCanCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSet();
@@ -239,9 +202,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyIndexQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSetInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -282,9 +243,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->garbageCollector->processDatamap_afterDatabaseOperations('update', 'pages', 2, $changeSet, $dataHandler);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSetForMultipleSubpages(): void
     {
         $this->prepareCanCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSetForMultipleSubpages();
@@ -294,9 +253,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyIndexQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageFromSubPagesWhenPageIsSetToHiddenAndExtendToSubPagesIsSetForMultipleSubpagesInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -338,9 +295,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->garbageCollector->processDatamap_afterDatabaseOperations('update', 'pages', 2, $changeSet, $dataHandler);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageIfPageTreeIsMoved(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_collect_garbage_if_page_tree_is_moved.csv');
@@ -364,9 +319,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertSolrContainsDocumentCount(0);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageIfPageTreeIsMovedToSysfolderWithDisabledOptionIncludeSubEntriesInSearch(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_collect_garbage_if_page_tree_is_moved.csv');
@@ -389,9 +342,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertSolrContainsDocumentCount(0);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCollectGarbageIfPageTreeIsMovedButStaysOnSamePage(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_collect_garbage_if_page_tree_is_moved.csv');
@@ -415,9 +366,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertSolrContainsDocumentCount(3);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveDeletedContentElement(): void
     {
         $this->prepareCanRemoveDeletedContentElement();
@@ -440,9 +389,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('will stay!', $solrContent, 'solr did not contain rendered page content');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveDeletedContentElementInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -461,7 +408,7 @@ class GarbageCollectorTest extends IntegrationTestBase
      */
     protected function prepareCanRemoveDeletedContentElement(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         $this->addSimpleFrontendRenderingToTypoScriptRendering(1);
         $this->importCSVDataSet(__DIR__ . '/Fixtures/indexed_content.csv');
 
@@ -479,9 +426,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->dataHandler->process_datamap();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveHiddenContentElement(): void
     {
         $data = ['tt_content' => ['88' => ['hidden' => 1]]];
@@ -506,9 +451,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('will stay!', $solrContent, 'solr did not contain rendered page content');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveHiddenContentElementInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -525,9 +468,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyEventQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveContentElementWithEndTimeSetToPast(): void
     {
         $timeStampInPast = time() - (60 * 60 * 24);
@@ -549,9 +490,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('will stay!', $solrContent, 'solr did not contain rendered page content');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveContentElementWithEndTimeSetToPastInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -569,9 +508,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyEventQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function doesNotRemoveUpdatedContentElementWithNotSetEndTime(): void
     {
         $data = ['tt_content' => ['88' => ['bodytext' => 'Updated! Will stay after update!' ]]];
@@ -595,9 +532,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('Updated! Will stay after update!', $solrContent, 'solr did not remove content hidden by endtime in past');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function doesNotRemoveUpdatedContentElementWithNotSetEndTimeInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -614,9 +549,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertEmptyEventQueue();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveContentElementWithStartDateSetToFuture(): void
     {
         $timestampInFuture = time() +  (60 * 60 * 24);
@@ -637,9 +570,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('will stay!', $solrContent, 'solr did not contain rendered page content');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemoveContentElementWithStartDateSetToFutureInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -670,7 +601,7 @@ class GarbageCollectorTest extends IntegrationTestBase
      */
     protected function prepareCanRemoveContentElementTests(array $dataMap, string $fixture = 'indexed_content.csv', array $indexPageIds = [1]): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         $this->addSimpleFrontendRenderingToTypoScriptRendering(1);
         $this->importCSVDataSet(__DIR__ . '/Fixtures/' . $fixture);
 
@@ -691,9 +622,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->dataHandler->clear_cacheCmd('all');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenPageIsHidden(): void
     {
         $dataMap = ['pages' => ['2' => ['hidden' => 1]]];
@@ -720,9 +649,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('"numFound":1', $solrContent, 'Expected to have two documents in the index');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenPageIsHiddenInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -736,9 +663,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertIndexQueueContainsItemAmount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenPageIsDeleted(): void
     {
         $cmd = ['pages' => [2 => ['delete' => 1 ]]];
@@ -765,9 +690,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertStringContainsString('"numFound":1', $solrContent, 'Expected to have two documents in the index');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenPageIsDeletedInDelayedProcessingMode(): void
     {
         $this->extensionConfiguration->set('solr', ['monitoringType' => 1]);
@@ -781,9 +704,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->assertIndexQueueContainsItemAmount(1);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenContentElementOnAlreadyDeletedPageIsDeleted(): void
     {
         $this->addSimpleFrontendRenderingToTypoScriptRendering(1);
@@ -802,9 +723,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertEquals(234, $queueItemUid);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenContentElementOnNonExistingPageIsDeleted(): void
     {
         $this->addSimpleFrontendRenderingToTypoScriptRendering(1);
@@ -821,9 +740,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         self::assertEquals(123, $queueItemUid);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRemovePageWhenContentElementOnAlreadyDeletedSiteIsDeleted(): void
     {
         // simulate that site root is deleted
@@ -853,7 +770,7 @@ class GarbageCollectorTest extends IntegrationTestBase
      */
     protected function prepareCanRemovePagesTests(array $dataMap, array $cmdMap = []): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         $this->addSimpleFrontendRenderingToTypoScriptRendering(1);
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_remove_page.csv');
 
@@ -872,9 +789,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $this->dataHandler->clear_cacheCmd('all');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canTriggerHookAfterRecordDeletion(): void
     {
         $this->prepareCanTriggerHookAfterRecordDeletion();
@@ -890,9 +805,7 @@ class GarbageCollectorTest extends IntegrationTestBase
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr']['postProcessGarbageCollector'] = [];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canTriggerHookAfterRecordDeletionInDelayedProcessingMode(): void
     {
         /** @var TestGarbageCollectorPostProcessor $hook */
@@ -923,13 +836,13 @@ class GarbageCollectorTest extends IntegrationTestBase
             plugin.tx_solr.index.queue {
                 foo = 1
                 foo {
-                    table = tx_fakeextension_domain_model_foo
+                    type = tx_fakeextension_domain_model_foo
                     fields.title = title
                 }
             }'
         );
 
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_foo', 111);
         $this->waitToBeVisibleInSolr();

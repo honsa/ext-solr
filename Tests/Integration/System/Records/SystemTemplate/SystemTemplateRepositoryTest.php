@@ -17,6 +17,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\System\Records\SystemTemplat
 
 use ApacheSolrForTypo3\Solr\System\Records\SystemTemplate\SystemTemplateRepository;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -24,10 +25,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class SystemTemplateRepositoryTest extends IntegrationTestBase
 {
-    /**
-     * @test
-     */
-    public function canFindOneClosestPageIdWithActiveTemplateByRootLine()
+    #[Test]
+    public function canFindOneClosestPageIdWithActiveTemplateByRootLine(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/sys_template.csv');
 

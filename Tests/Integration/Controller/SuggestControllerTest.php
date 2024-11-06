@@ -17,15 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Controller;
 
 use ApacheSolrForTypo3\Solr\Controller\SuggestController;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
  * Integration testcase to test for {@link SuggestController}
- *
- * @author Timo Hund
- * @group frontend
  */
+#[Group('frontend')]
 class SuggestControllerTest extends IntegrationTestBase
 {
     protected function setUp(): void
@@ -50,28 +50,12 @@ class SuggestControllerTest extends IntegrationTestBase
      */
     protected function tearDown(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function canDoABasicSuggest()
-    {
-        $this->importCSVDataSet(__DIR__ . '/Fixtures/indexing_data.csv');
-        $this->indexPages([1, 2, 3, 4, 5, 6, 7, 8]);
-
-        $result = (string)($this->executeFrontendSubRequestForSuggestQueryString('Sweat', 'rand')->getBody());
-
-        // we assume to get suggestions like Sweatshirt
-        self::assertStringContainsString('suggestions":{"sweatshirts":2}', $result, 'Response did not contain sweatshirt suggestions');
-    }
-
-    /**
-     * @test
-     */
-    public function canDoABasicSuggestWithoutCallback()
+    #[Test]
+    public function canDoABasicSuggest(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/indexing_data.csv');
         $this->indexPages([1, 2, 3, 4, 5, 6, 7, 8]);
@@ -82,10 +66,8 @@ class SuggestControllerTest extends IntegrationTestBase
         self::assertStringContainsString('suggestions":{"sweatshirts":2}', $result, 'Response did not contain sweatshirt suggestions');
     }
 
-    /**
-     * @test
-     */
-    public function canSuggestWithUriSpecialChars()
+    #[Test]
+    public function canSuggestWithUriSpecialChars(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/suggest_with_uri_special_chars.csv');
 
@@ -118,13 +100,13 @@ class SuggestControllerTest extends IntegrationTestBase
 
     protected function expectSuggested(string $prefix, string $expected)
     {
-        $result = (string)($this->executeFrontendSubRequestForSuggestQueryString($prefix, 'rand')->getBody());
+        $result = (string)($this->executeFrontendSubRequestForSuggestQueryString($prefix)->getBody());
 
         //we assume to get suggestions like some/large/path
         self::assertStringContainsString($expected, $result, 'Response did not contain expected suggestions: ' . $expected);
     }
 
-    protected function executeFrontendSubRequestForSuggestQueryString(string $queryString, string $callback = null): ResponseInterface
+    protected function executeFrontendSubRequestForSuggestQueryString(string $queryString): ResponseInterface
     {
         $request = new InternalRequest('http://testone.site/en/');
         $request = $request
@@ -132,9 +114,6 @@ class SuggestControllerTest extends IntegrationTestBase
             ->withQueryParameter('type', '7384')
             ->withQueryParameter('tx_solr[queryString]', $queryString);
 
-        if ($callback !== null) {
-            $request = $request->withQueryParameter('tx_solr[callback]', $callback);
-        }
         return $this->executeFrontendSubRequest($request);
     }
 }

@@ -24,8 +24,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Writes the last searches
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class LastSearchesComponent
 {
@@ -46,7 +44,7 @@ class LastSearchesComponent
 
         $query = $resultSet->getUsedSearchRequest()->getRawUserQuery();
 
-        if (!empty($query)) {
+        if (!empty($query) && $event->getTypoScriptConfiguration()->getSearchLastSearchesMode() !== 'disabled') {
             $lastSearchesService = $this->getLastSearchesService($resultSet);
             $lastSearchesService->addToLastSearches($query);
         }

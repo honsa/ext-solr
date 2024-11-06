@@ -18,23 +18,21 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\TCA;
 use ApacheSolrForTypo3\Solr\System\TCA\TCAService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\DateTimeAspect;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase to test the TCAService.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class TCAServiceTest extends SetUpUnitTestCase
 {
     /**
      * When a deleted record is passed (has 1 in the TCA deleted field, this should be detected).
-     *
-     * @test
      */
-    public function getIsEnabledRecordDetectDeletedRecord()
+    #[Test]
+    public function getIsEnabledRecordDetectDeletedRecord(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -56,10 +54,9 @@ class TCAServiceTest extends SetUpUnitTestCase
 
     /**
      * When a record is passed that is not deleted we should detect that.
-     *
-     * @test
      */
-    public function getIsEnabledRecordDetectNonDeletedRecord()
+    #[Test]
+    public function getIsEnabledRecordDetectNonDeletedRecord(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -81,10 +78,9 @@ class TCAServiceTest extends SetUpUnitTestCase
 
     /**
      * When a page record is passed with the field no_search = 1 it should be detected is invisible
-     *
-     * @test
      */
-    public function getIsEnabledRecordDetectsPageConfiguredWithNoSearch()
+    #[Test]
+    public function getIsEnabledRecordDetectsPageConfiguredWithNoSearch(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -106,10 +102,9 @@ class TCAServiceTest extends SetUpUnitTestCase
 
     /**
      * When a page record is passed with the field no_search = 1 it should be detected is invisible
-     *
-     * @test
      */
-    public function getIsEnabledRecordEmptyRecord()
+    #[Test]
+    public function getIsEnabledRecordEmptyRecord(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -127,10 +122,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($isVisible);
     }
 
-    /**
-     * @test
-     */
-    public function isEndTimeInPastCanDetectedEndtimeThatIsInPast()
+    #[Test]
+    public function isEndTimeInPastCanDetectedEndtimeThatIsInPast(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -153,10 +146,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertTrue($isEndTimeInPast, 'Endtime in past was not detected as endtime in past');
     }
 
-    /**
-     * @test
-     */
-    public function isEndTimeInPastCanDetectedEndtimeThatIsNotInPast()
+    #[Test]
+    public function isEndTimeInPastCanDetectedEndtimeThatIsNotInPast(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -179,10 +170,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($isEndTimeInPast, 'Endtime in future, was detected as endtime in past');
     }
 
-    /**
-     * @test
-     */
-    public function isEndTimeInPastCanDetectedEndtimeIsEmpty()
+    #[Test]
+    public function isEndTimeInPastCanDetectedEndtimeIsEmpty(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -206,10 +195,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($isEndTimeInPast, 'Not set endtime(default 0), was detected as endtime in past.');
     }
 
-    /**
-     * @test
-     */
-    public function isStartTimeInFutureCanDetectedStartTimeInFuture()
+    #[Test]
+    public function isStartTimeInFutureCanDetectedStartTimeInFuture(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -232,10 +219,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertTrue($isStartTimeInFuture, 'Starttime in future was not detected as start time in future');
     }
 
-    /**
-     * @test
-     */
-    public function isStartTimeInFutureCanDetectedStartTimeNotInFuture()
+    #[Test]
+    public function isStartTimeInFutureCanDetectedStartTimeNotInFuture(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -258,10 +243,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($isStartTimeInFuture, 'Start time in past was detected as starttime in future');
     }
 
-    /**
-     * @test
-     */
-    public function isHiddenCanDetectHiddenRecord()
+    #[Test]
+    public function isHiddenCanDetectHiddenRecord(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -282,10 +265,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertTrue($isHidden, 'Page was expected to be hidden');
     }
 
-    /**
-     * @test
-     */
-    public function isHiddenCanDetectNonHiddenRecord()
+    #[Test]
+    public function isHiddenCanDetectNonHiddenRecord(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -306,10 +287,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($isHidden, 'Page was not expected to be hidden');
     }
 
-    /**
-     * @test
-     */
-    public function canNormalizeFrontendGroupField()
+    #[Test]
+    public function canNormalizeFrontendGroupField(): void
     {
         $fakeTCA = [
             'pages' => [
@@ -328,10 +307,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertSame($normalizedRecord['fe_groups'], '0', 'Empty fe_group field was not normalized to 0');
     }
 
-    /**
-     * @test
-     */
-    public function getVisibilityAffectingFieldsByTableCanReturnDefaultFieldsWhenNoTCAIsConfigured()
+    #[Test]
+    public function getVisibilityAffectingFieldsByTableCanReturnDefaultFieldsWhenNoTCAIsConfigured(): void
     {
         $tcaService = new TCAService([]);
         $visibilityFields = $tcaService->getVisibilityAffectingFieldsByTable('pages');
@@ -340,20 +317,16 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertStringContainsString('no_search', $visibilityFields, 'Expected to have no_search as visibility affecting field as default for pages');
     }
 
-    /**
-     * @test
-     */
-    public function getVisibilityAffectingFieldsByTableCanReturnUidAndPidForNormalRecordTable()
+    #[Test]
+    public function getVisibilityAffectingFieldsByTableCanReturnUidAndPidForNormalRecordTable(): void
     {
         $tcaService = new TCAService([]);
         $visibilityFields = $tcaService->getVisibilityAffectingFieldsByTable('tx_domain_model_faketable');
         self::assertEquals('uid, pid', $visibilityFields, 'TCA Service should return uid and pid of visibility affecting fields for record table where no TCA is configured');
     }
 
-    /**
-     * @test
-     */
-    public function getVisibilityAffectingFieldsByTableCanReturnConfiguredDeleteField()
+    #[Test]
+    public function getVisibilityAffectingFieldsByTableCanReturnConfiguredDeleteField(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [
@@ -368,10 +341,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertStringContainsString('deleted', $visibilityFields, 'The deleted field should be retrieved as visibility affecting field');
     }
 
-    /**
-     * @test
-     */
-    public function getVisibilityAffectingFieldsByTableCanReturnConfiguredEnableConfiguredEnabledColumnFields()
+    #[Test]
+    public function getVisibilityAffectingFieldsByTableCanReturnConfiguredEnableConfiguredEnabledColumnFields(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [
@@ -388,10 +359,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertStringContainsString('fe_groups', $visibilityFields, 'The field fe_groups should be retrieved as visbility affecting field');
     }
 
-    /**
-     * @test
-     */
-    public function getTranslationOriginalUid()
+    #[Test]
+    public function getTranslationOriginalUid(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [
@@ -408,10 +377,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertSame(999, $l10nParentUid, 'l10nParentUid should be null when the data is not set in the record');
     }
 
-    /**
-     * @test
-     */
-    public function getTranslationOriginalUidReturnsNullWhenFieldIsEmpty()
+    #[Test]
+    public function getTranslationOriginalUidReturnsNullWhenFieldIsEmpty(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [
@@ -428,10 +395,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertNull($l10nParentUid, 'l10nParentUid should be null when the data is not set in the record');
     }
 
-    /**
-     * @test
-     */
-    public function getTranslationOriginalUidReturnsNullWhenPointerFieldIsNotConfigured()
+    #[Test]
+    public function getTranslationOriginalUidReturnsNullWhenPointerFieldIsNotConfigured(): void
     {
         $tcaService = new TCAService([]);
         $fakeRecord = [];
@@ -439,10 +404,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertNull($l10nParentUid, 'l10nParentUid should be null when the data is not set in the record');
     }
 
-    /**
-     * @test
-     */
-    public function isLocalizedRecord()
+    #[Test]
+    public function isLocalizedRecord(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [
@@ -459,10 +422,8 @@ class TCAServiceTest extends SetUpUnitTestCase
         self::assertFalse($tcaService->isLocalizedRecord('tx_domain_model_faketable_withouttca', ['l10n_parent' => 9999]), 'Item without tca should not be indicated as translation');
     }
 
-    /**
-     * @test
-     */
-    public function getTranslationOriginalUidIfTranslated()
+    #[Test]
+    public function getTranslationOriginalUidIfTranslated(): void
     {
         $fakeTCA = [
             'tx_domain_model_faketable' => [

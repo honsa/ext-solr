@@ -19,23 +19,15 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Sorting\Sorting;
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Unit test case for the ObjectReconstitutionProcessor.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SortingTest extends SetUpUnitTestCase
 {
-    /**
-     * @var Sorting
-     */
-    protected $sorting;
-
-    /**
-     * @var SearchResultSet
-     */
-    protected $resultSetMock;
+    protected Sorting $sorting;
+    protected SearchResultSet $resultSetMock;
 
     protected function setUp(): void
     {
@@ -51,51 +43,39 @@ class SortingTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canNotCreateWhenInvalidDirectionIsPassed()
+    #[Test]
+    public function canNotCreateWhenInvalidDirectionIsPassed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new Sorting($this->resultSetMock, 'Color', 'color_s', 'invalid direction', 'the color', false, false);
     }
 
-    /**
-     * @test
-     */
-    public function canGetName()
+    #[Test]
+    public function canGetName(): void
     {
         self::assertSame('Price', $this->sorting->getName(), 'Could not get name from sorting');
     }
 
-    /**
-     * @test
-     */
-    public function canGetLabel()
+    #[Test]
+    public function canGetLabel(): void
     {
         self::assertSame('the príce', $this->sorting->getLabel(), 'Could not get label from sorting');
     }
 
-    /**
-     * @test
-     */
-    public function canGetField()
+    #[Test]
+    public function canGetField(): void
     {
         self::assertSame('price_f', $this->sorting->getField(), 'Could not get field from sorting');
     }
 
-    /**
-     * @test
-     */
-    public function canGetDirection()
+    #[Test]
+    public function canGetDirection(): void
     {
         self::assertSame('asc', $this->sorting->getDirection(), 'Could not get direction');
     }
 
-    /**
-     * @test
-     */
-    public function canGetOppositeDirection()
+    #[Test]
+    public function canGetOppositeDirection(): void
     {
         self::assertSame('desc', $this->sorting->getOppositeDirection(), 'Could not get opposite direction');
 
@@ -103,26 +83,20 @@ class SortingTest extends SetUpUnitTestCase
         self::assertSame('asc', $descSorting->getOppositeDirection(), 'Could not get opposite direction');
     }
 
-    /**
-     * @test
-     */
-    public function getGetIsAsDirection()
+    #[Test]
+    public function getGetIsAsDirection(): void
     {
         self::assertTrue($this->sorting->getIsAscDirection(), 'Sorting direction was not handled as ascending');
     }
 
-    /**
-     * @test
-     */
-    public function getGetIsDescDirection()
+    #[Test]
+    public function getGetIsDescDirection(): void
     {
         self::assertFalse($this->sorting->getIsDescDirection(), 'Sorting should be indicated to not be descending');
     }
 
-    /**
-     * @test
-     */
-    public function canGetIsResetOption()
+    #[Test]
+    public function canGetIsResetOption(): void
     {
         self::assertFalse($this->sorting->getIsResetOption(), 'Sorting options should not be a reset option');
     }

@@ -17,16 +17,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\Query\ParameterBuilde
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\BigramPhraseFields;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class BigramPhraseFieldsTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function buildFromEmptyStringCreatesEmptyArrayOnBuild()
+    #[Test]
+    public function buildFromEmptyStringCreatesEmptyArrayOnBuild(): void
     {
         $bigramPhraseFields = BigramPhraseFields::fromString('');
         self::assertSame('', $bigramPhraseFields->toString());

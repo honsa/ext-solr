@@ -17,16 +17,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\UserFunctions;
 
 use ApacheSolrForTypo3\Solr\System\UserFunctions\FlexFormUserFunctions;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class FlexFormUserFunctionsTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function whenNoFacetsAreConfiguredAllSolrFieldsShouldBeAvailableAsFilter()
+    #[Test]
+    public function whenNoFacetsAreConfiguredAllSolrFieldsShouldBeAvailableAsFilter(): void
     {
         $userFunc = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getFieldNamesFromSolrMetaDataForPage', 'getConfiguredFacetsForPage'])->getMock();
@@ -45,10 +41,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertEquals(0, $parentInformation['items'][0][0] ?? null);
     }
 
-    /**
-     * @test
-     */
-    public function labelIsUsedFromFacetWhenTheFacetIsConfiguredInTypoScript()
+    #[Test]
+    public function labelIsUsedFromFacetWhenTheFacetIsConfiguredInTypoScript(): void
     {
         $userFunc = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getFieldNamesFromSolrMetaDataForPage', 'getConfiguredFacetsForPage'])->getMock();
@@ -72,10 +66,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertEquals('type (Facet Label: "The type")', $parentInformation['items']['type'][0]);
     }
 
-    /**
-     * @test
-     */
-    public function duplicateFacetLabelDoesNotMakeFieldsDisappearingInFlexForms()
+    #[Test]
+    public function duplicateFacetLabelDoesNotMakeFieldsDisappearingInFlexForms(): void
     {
         $flexFormUserFunctionsMock = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getFieldNamesFromSolrMetaDataForPage', 'getConfiguredFacetsForPage'])->getMock();
@@ -105,10 +97,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertCount(2, $parentInformation['items']);
     }
 
-    /**
-     * @test
-     */
-    public function facetLabelIsShownTranslatedInBracketsSignsInFlexFormsIfTranslationIsAvailable()
+    #[Test]
+    public function facetLabelIsShownTranslatedInBracketsSignsInFlexFormsIfTranslationIsAvailable(): void
     {
         $flexFormUserFunctionsMock = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getFieldNamesFromSolrMetaDataForPage', 'getConfiguredFacetsForPage', 'getTranslation'])->getMock();
@@ -154,10 +144,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertEquals('someQuiteOther_field (Facet Label: "LLL:EXT:some_ext/locallang.xlf:not_existing_label")', $parentInformation['items']['someQuiteOther_field'][0]);
     }
 
-    /**
-     * @test
-     */
-    public function cObjectPathIsShownInBracketsSignsInFlexFormsIfcObjectIsUsed()
+    #[Test]
+    public function cObjectPathIsShownInBracketsSignsInFlexFormsIfcObjectIsUsed(): void
     {
         $flexFormUserFunctionsMock = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getFieldNamesFromSolrMetaDataForPage', 'getConfiguredFacetsForPage'])->getMock();
@@ -183,10 +171,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertEquals('some_field (Facet Label: "cObject[...faceting.facets.someFacet.label]")', $parentInformation['items']['some_field'][0]);
     }
 
-    /**
-     * @test
-     */
-    public function passingNullRowReturnsEmptyItems()
+    #[Test]
+    public function passingNullRowReturnsEmptyItems(): void
     {
         $userFunc = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods(['getConfiguredFacetsForPage'])->getMock();
@@ -206,10 +192,8 @@ class FlexFormUserFunctionsTest extends SetUpUnitTestCase
         self::assertCount(0, $parentInformation['items']);
     }
 
-    /**
-     * @test
-     */
-    public function canGetExpectedSelectOptions()
+    #[Test]
+    public function canGetExpectedSelectOptions(): void
     {
         $userFunc = $this->getMockBuilder(FlexFormUserFunctions::class)
             ->onlyMethods([

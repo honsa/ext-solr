@@ -17,6 +17,8 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Site;
 
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteHashService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\UriInterface;
 use Traversable;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -27,8 +29,6 @@ use TYPO3\CMS\Core\Site\SiteFinder;
  * Testcase to check if the SiteHashService class works as expected.
  *
  * The unit test is used to make sure that the SiteHashService works as expected when the calls to Site:: are mocked
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SiteHashServiceTest extends SetUpUnitTestCase
 {
@@ -41,11 +41,9 @@ class SiteHashServiceTest extends SetUpUnitTestCase
         yield 'nullIsFallingBackToCurrentSiteOnly' => [null, 'solrtesta.local'];
     }
 
-    /**
-     * @dataProvider canResolveSiteHashAllowedSitesDataProvider
-     * @test
-     */
-    public function canResolveSiteHashAllowedSites($allowedSitesConfiguration, $expectedAllowedSites)
+    #[DataProvider('canResolveSiteHashAllowedSitesDataProvider')]
+    #[Test]
+    public function canResolveSiteHashAllowedSites($allowedSitesConfiguration, $expectedAllowedSites): void
     {
         $siteLanguageMock = $this->createMock(SiteLanguage::class);
         $siteLanguageMock->method('getLanguageId')->willReturn(0);
@@ -78,10 +76,8 @@ class SiteHashServiceTest extends SetUpUnitTestCase
         self::assertSame($expectedAllowedSites, $allowedSites, 'resolveSiteHashAllowedSites did not return expected allowed sites');
     }
 
-    /**
-     * @test
-     */
-    public function getSiteHashForDomain()
+    #[Test]
+    public function getSiteHashForDomain(): void
     {
         $oldKey = $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'];
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'] = 'testKey';

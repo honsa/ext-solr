@@ -2,7 +2,7 @@
 <f:layout name="Backend/WithPageTree"/>
 
 <f:section name="Main">
-    <f:be.pageRenderer includeCssFiles="{0: '{f:uri.resource(path:\'StyleSheets/Backend/InfoModule.css\')}'}"/>
+    <f:be.pageRenderer includeCssFiles="{0: '{f:uri.resource(path:\'EXT:solr/Resources/Public/StyleSheets/Backend/InfoModule.css\')}'}"/>
 
     <div role="tabpanel">
         <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs-tab" data-store-last-tab="1">
@@ -118,14 +118,9 @@
 
     <div class="row">
         <div class="col-md-12">
-            <script type="application/javascript">
-                var queryLabels = <f:format.raw>{queriesChartLabels}</f:format.raw>;
-                var queryData = {queriesChartData};
-            </script>
-            <canvas id="queriesOverTime"></canvas>
+            <canvas id="queriesOverTime" data-query-labels="{queriesChartLabels}" data-query-data="{queriesChartData}"></canvas>
         </div>
     </div>
-
 
     <f:if condition="{top_search_phrases}">
         <div class="row">
@@ -311,7 +306,7 @@
 
                                     <td>
                                         <span class="btn btn-default">
-                                            <f:link.action action="documentsDetails" arguments="{uid: document.uid, type: document.type, languageUid: language, pageId: pageId}" title="Show details">
+                                            <f:link.action action="documentsDetails" arguments="{uid: document.uid, type: document.type, languageUid: language, selectedPageUID: selectedPageUID}" title="Show details">
                                                 <core:icon identifier="actions-document-view" />
                                             </f:link.action>
                                         </span>

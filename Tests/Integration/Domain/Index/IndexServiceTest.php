@@ -20,14 +20,14 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\System\Environment\CliEnvironment;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for the record indexer
- *
- * @author Timo Schmidt
  */
 class IndexServiceTest extends IntegrationTestBase
 {
@@ -66,13 +66,11 @@ class IndexServiceTest extends IntegrationTestBase
         ];
     }
 
-    /**
-     * @dataProvider canResolveBaseAsPrefixDataProvider
-     * @test
-     */
-    public function canResolveBaseAsPrefix(string $absRefPrefix, string $expectedUrl)
+    #[DataProvider('canResolveBaseAsPrefixDataProvider')]
+    #[Test]
+    public function canResolveBaseAsPrefix(string $absRefPrefix, string $expectedUrl): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_withBasePrefix_' . $absRefPrefix . '.csv');
 
@@ -98,6 +96,6 @@ class IndexServiceTest extends IntegrationTestBase
         $solrContent = file_get_contents($this->getSolrConnectionUriAuthority() . '/solr/core_en/select?q=*:*');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"url":"' . $expectedUrl, $solrContent, 'Generated unexpected url with absRefPrefix = auto');
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
     }
 }

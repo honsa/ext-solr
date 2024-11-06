@@ -20,23 +20,15 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\GroupItem;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResult;
 use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequest;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Unit test case for the Group class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class GroupItemTest extends SetUpUnitTestCase
 {
-    /**
-     * @var GroupItem
-     */
-    protected $groupItem;
-
-    /**
-     * @var Group
-     */
-    protected $parentGroup;
+    protected GroupItem $groupItem;
+    protected Group $parentGroup;
 
     protected function setUp(): void
     {
@@ -52,50 +44,38 @@ class GroupItemTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canGetMaximumScore()
+    #[Test]
+    public function canGetMaximumScore(): void
     {
         self::assertSame(99.0, $this->groupItem->getMaximumScore(), 'Unexpected maximumScore');
     }
 
-    /**
-     * @test
-     */
-    public function canGetStart()
+    #[Test]
+    public function canGetStart(): void
     {
         self::assertSame(1, $this->groupItem->getStart(), 'Unexpected start');
     }
 
-    /**
-     * @test
-     */
-    public function canGetNumFound()
+    #[Test]
+    public function canGetNumFound(): void
     {
         self::assertSame(12, $this->groupItem->getAllResultCount(), 'Unexpected numFound');
     }
 
-    /**
-     * @test
-     */
-    public function canGetGroupValue()
+    #[Test]
+    public function canGetGroupValue(): void
     {
         self::assertSame('pages', $this->groupItem->getGroupValue(), 'Unexpected groupValue');
     }
 
-    /**
-     * @test
-     */
-    public function canGetGroup()
+    #[Test]
+    public function canGetGroup(): void
     {
         self::assertSame($this->parentGroup, $this->groupItem->getGroup(), 'Unexpected parentGroup');
     }
 
-    /**
-     * @test
-     */
-    public function canGetSearchResults()
+    #[Test]
+    public function canGetSearchResults(): void
     {
         self::assertSame(0, $this->groupItem->getSearchResults()->getCount());
 

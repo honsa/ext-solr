@@ -17,19 +17,16 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Task;
 
 use ApacheSolrForTypo3\Solr\Task\IndexQueueWorkerTask;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Core\Environment;
 
 /**
  * Testcase for IndexQueueWorkerTask
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class IndexQueueWorkerTaskTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetWebRoot()
+    #[Test]
+    public function canGetWebRoot(): void
     {
         $indexQueuerWorker = $this->getMockBuilder(IndexQueueWorkerTask::class)
             ->disableOriginalConstructor()
@@ -48,10 +45,8 @@ class IndexQueueWorkerTaskTest extends SetUpUnitTestCase
         self::assertSame(Environment::getPublicPath() . '/../test/', $indexQueuerWorker->getWebRoot(), 'Could not use a marker in forced webroot');
     }
 
-    /**
-     * @test
-     */
-    public function canGetErrorMessageInAdditionalInformationWhenSiteNotAvailable()
+    #[Test]
+    public function canGetErrorMessageInAdditionalInformationWhenSiteNotAvailable(): void
     {
         $indexQueuerWorker = $this->getMockBuilder(IndexQueueWorkerTask::class)
             ->disableOriginalConstructor()

@@ -28,6 +28,7 @@ use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerResponse;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -75,9 +76,7 @@ class PageIndexerTest extends SetUpUnitTestCase
         return $pageIndexer;
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testIndexPageItemIsSendingFrontendRequestsToExpectedUrls(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['solr'] = [];
@@ -106,9 +105,11 @@ class PageIndexerTest extends SetUpUnitTestCase
         $indexResponse->expects(self::once())->method('getActionResult')->with('indexPage')->willReturn(['pageIndexed' => 'Success']);
 
         // Two requests will be send, the first one for the access groups, the second one for the indexing itself
-        $this->pageIndexerRequestMock->expects(self::exactly(2))->method('send')->with('http://myfrontendurl.de/index.php?id=4711&L=0')->will(
-            self::onConsecutiveCalls($accessGroupResponse, $indexResponse)
-        );
+        $this->pageIndexerRequestMock
+            ->expects(self::exactly(2))
+            ->method('send')
+            ->with('http://myfrontendurl.de/index.php?id=4711&L=0')
+            ->willReturn($accessGroupResponse, $indexResponse);
 
         $pageIndexer = $this->getPageIndexerWithMockedDependencies([]);
         $pageRootLineMock = $this->createMock(Rootline::class);

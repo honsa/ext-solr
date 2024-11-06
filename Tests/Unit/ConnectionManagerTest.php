@@ -21,6 +21,8 @@ use ApacheSolrForTypo3\Solr\Exception\InvalidConnectionException;
 use ApacheSolrForTypo3\Solr\System\Configuration\ConfigurationManager;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
@@ -28,13 +30,12 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Traversable;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * PHP Unit test for connection manager
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 class ConnectionManagerTest extends SetUpUnitTestCase
 {
@@ -67,6 +68,7 @@ class ConnectionManagerTest extends SetUpUnitTestCase
         $container->set(RequestFactoryInterface::class, $this->createMock(RequestFactoryInterface::class));
         $container->set(StreamFactoryInterface::class, $this->createMock(StreamFactoryInterface::class));
         $container->set(EventDispatcherInterface::class, $this->createMock(EventDispatcherInterface::class));
+        $container->set(SiteFinder::class, $this->createMock(SiteFinder::class));
         GeneralUtility::setContainer($container);
 
         parent::setUp();
@@ -119,11 +121,10 @@ class ConnectionManagerTest extends SetUpUnitTestCase
     }
 
     /**
-     * Tests the connect
-     *
-     * @dataProvider connectDataProvider
-     * @test
+     * Tests the connection
      */
+    #[DataProvider('connectDataProvider')]
+    #[Test]
     public function canConnect(
         string $scheme,
         string $host,

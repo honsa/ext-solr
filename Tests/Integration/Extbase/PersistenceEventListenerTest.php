@@ -19,8 +19,19 @@ use ApacheSolrForTypo3\FakeExtension\Domain\Model\Foo;
 use ApacheSolrForTypo3\FakeExtension\Domain\Repository\FooRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use Doctrine\DBAL\Exception as DBALException;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\TypoScript\AST\Node\RootNode;
+use TYPO3\CMS\Core\TypoScript\FrontendTypoScript;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class PersistenceEventListenerTest extends IntegrationTestBase
@@ -33,7 +44,11 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     protected ?Queue $indexQueue = null;
     protected ?FooRepository $repository = null;
     protected ?PersistenceManager $persistenceManager = null;
+    protected ServerRequest $serverRequest;
 
+    /**
+     * @throws SiteNotFoundException
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -45,12 +60,24 @@ class PersistenceEventListenerTest extends IntegrationTestBase
         $this->indexQueue = GeneralUtility::makeInstance(Queue::class);
         $this->repository = GeneralUtility::makeInstance(FooRepository::class);
         $this->persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
+
+        $frontendTypoScript = new FrontendTypoScript(new RootNode(), [], [], []);
+        $frontendTypoScript->setSetupArray([]);
+        $GLOBALS['TYPO3_REQUEST'] = $this->serverRequest = (new ServerRequest('http://testone.site/'))
+            ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE)
+            ->withAttribute('frontend.typoscript', $frontendTypoScript)
+            ->withAttribute(
+                'site',
+                $this->get(SiteFinder::class)->getSiteByIdentifier('integration_tree_one')
+            );
     }
 
     /**
-     * @test
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function newEntityIsAddedToIndexQueue()
+    #[Test]
+    public function newEntityIsAddedToIndexQueue(): void
     {
         $object = new Foo();
         $object->setTitle('Added');
@@ -62,9 +89,11 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function newHiddenEntityIsNotAddedToIndexQueue()
+    #[Test]
+    public function newHiddenEntityIsNotAddedToIndexQueue(): void
     {
         $object = new Foo();
         $object->setTitle('Added');
@@ -77,9 +106,13 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws AspectNotFoundException
+     * @throws UnknownObjectException
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function updatedEntityIsUpdatedInIndexQueue()
+    #[Test]
+    public function updatedEntityIsUpdatedInIndexQueue(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/update_items.csv');
         /** @var Foo $object */
@@ -88,6 +121,7 @@ class PersistenceEventListenerTest extends IntegrationTestBase
         $this->repository->update($object);
         $this->persistenceManager->persistAll();
 
+        /** @var Context $context */
         $context = GeneralUtility::makeInstance(Context::class);
         $currentTimestamp = $context->getPropertyFromAspect('date', 'timestamp');
 
@@ -100,9 +134,11 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function softDeletedEntityIsRemovedFromIndexQueue()
+    #[Test]
+    public function softDeletedEntityIsRemovedFromIndexQueue(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/delete_items.csv');
         /** @var Foo $object */
@@ -114,9 +150,11 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function deletedEntityIsRemovedFromIndexQueue()
+    #[Test]
+    public function deletedEntityIsRemovedFromIndexQueue(): void
     {
         unset($GLOBALS['TCA']['tx_fakeextension_domain_model_foo']['ctrl']['delete']);
         $this->importCSVDataSet(__DIR__ . '/Fixtures/delete_items.csv');
@@ -129,9 +167,12 @@ class PersistenceEventListenerTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws UnknownObjectException
+     * @throws IllegalObjectTypeException
+     * @throws DBALException
      */
-    public function updatedEntityTurnedHiddenIsRemovedFromIndexQueue()
+    #[Test]
+    public function updatedEntityTurnedHiddenIsRemovedFromIndexQueue(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/hidden_items.csv');
         /** @var Foo $object */

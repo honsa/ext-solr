@@ -31,8 +31,6 @@ use TYPO3\CMS\Reports\Status;
 /**
  * Provides a status report about whether a connection to the Solr server can
  * be established.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class SolrStatus extends AbstractSolrStatus
 {
@@ -121,11 +119,10 @@ class SolrStatus extends AbstractSolrStatus
         $pingTime = $this->checkPingTime($solrAdmin);
         $configName = $this->checkSolrConfigName($solrAdmin);
         $schemaName = $this->checkSolrSchemaName($solrAdmin);
-        $streamBodySetting = $this->checkStreamBodySetting($solrAdmin);
 
         /** @phpstan-ignore-next-line */
         if ($this->responseStatus !== ContextualFeedbackSeverity::OK) {
-            $header = 'Failed contacting the Solr server or invalid settings found.';
+            $header = 'Failed contacting the Solr server.';
         }
 
         $variables = [
@@ -138,7 +135,6 @@ class SolrStatus extends AbstractSolrStatus
             'configName' => $configName,
             'schemaName' => $schemaName,
             'accessFilter' => $accessFilter,
-            'streamBodySetting' => $streamBodySetting,
         ];
 
         $report = $this->getRenderedReport('SolrStatus.html', $variables);
@@ -227,23 +223,6 @@ class SolrStatus extends AbstractSolrStatus
         }
 
         return $solrSchemaMessage;
-    }
-
-    protected function checkStreamBodySetting(SolrAdminService $solrAdminService): string
-    {
-        $systemProperties = $solrAdminService->getSystemProperties();
-        if ($systemProperties === null) {
-            $this->responseStatus = ContextualFeedbackSeverity::ERROR;
-            return 'Error determining system properties';
-        }
-
-        $streamSetting = (bool)($systemProperties['solr.enableStreamBody'] ?? false);
-        if (!$streamSetting) {
-            $this->responseStatus = ContextualFeedbackSeverity::ERROR;
-            return 'Content Streams not enabled';
-        }
-
-        return 'true';
     }
 
     /**

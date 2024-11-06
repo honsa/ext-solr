@@ -22,10 +22,10 @@ use ApacheSolrForTypo3\Solr\Access\RootlineElement;
 use ApacheSolrForTypo3\Solr\Domain\Index\PageIndexer\PageUriBuilder;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
-use ApacheSolrForTypo3\Solr\System\Util\SiteUtility;
 use Doctrine\DBAL\Exception as DBALException;
 use Exception;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use TYPO3\CMS\Core\Type\Bitmask\PageTranslationVisibility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,8 +35,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * In the case of pages we can't directly index the page records, we need to
  * retrieve the content that belongs to a page from tt_content, too.
  * Also, plugins may be included on a page and thus may need to be executed.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexer extends Indexer
 {
@@ -63,7 +61,7 @@ class PageIndexer extends Indexer
         foreach ($systemLanguageUids as $systemLanguageUid) {
             $contentAccessGroups = $this->getAccessGroupsFromContent($item, $systemLanguageUid);
             foreach ($contentAccessGroups as $userGroup) {
-                $this->indexPage($item, $systemLanguageUid, $userGroup);
+                $this->indexPage($item, $systemLanguageUid, (int)$userGroup);
             }
         }
 
@@ -225,12 +223,11 @@ class PageIndexer extends Indexer
      * Builds a URL for a given page ID and then actually build and return the page URL.
      *
      * @throws DBALException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function getDataUrl(Item $item, int $language = 0): string
     {
-        $pageId = $item->getRecordUid();
-        $uriBuilder = $this->getUriBuilder($pageId);
+        $uriBuilder = $this->getUriBuilder();
         $mountPointParameter = $this->getMountPageDataUrlParameter($item);
         return $uriBuilder->getPageIndexingUriFromPageItemAndLanguageId($item, $language, $mountPointParameter, $this->options);
     }
@@ -238,14 +235,10 @@ class PageIndexer extends Indexer
     /**
      * Returns the URI strategy object
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getUriBuilder(int $pageId): PageUriBuilder
+    protected function getUriBuilder(): PageUriBuilder
     {
-        if (!SiteUtility::getIsSiteManagedSite($pageId)) {
-            throw new \Exception('Site of page with uid ' . $pageId . ' is not a TYPO3 managed site');
-        }
-
         return GeneralUtility::makeInstance(PageUriBuilder::class);
     }
 
@@ -328,7 +321,7 @@ class PageIndexer extends Indexer
 
         if (empty($indexActionResult['pageIndexed'])) {
             $message = 'Failed indexing page Index Queue item: ' . $item->getIndexQueueUid() . ' url: ' . $indexRequestUrl;
-            throw new \RuntimeException($message, 1331837081);
+            throw new RuntimeException($message, 1331837081);
         }
 
         return $response;

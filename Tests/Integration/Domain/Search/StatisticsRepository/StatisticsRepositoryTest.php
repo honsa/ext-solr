@@ -17,15 +17,14 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Domain\Search\StatisticsRepo
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Statistics\StatisticsRepository;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class StatisticsRepositoryTest extends IntegrationTestBase
 {
-    /**
-     * @test
-     */
-    public function canGetTopKeywordsWithHits()
+    #[Test]
+    public function canGetTopKeywordsWithHits(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/statistics.csv');
         $fixtureTimestamp = 1471203378;
@@ -42,10 +41,8 @@ class StatisticsRepositoryTest extends IntegrationTestBase
         self::assertSame($expectedResult, $topHits);
     }
 
-    /**
-     * @test
-     */
-    public function canGetTopKeywordsWithoutHits()
+    #[Test]
+    public function canGetTopKeywordsWithoutHits(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/statistics.csv');
         $fixtureTimestamp = 1471203378;
@@ -62,10 +59,8 @@ class StatisticsRepositoryTest extends IntegrationTestBase
         self::assertSame($expectedResult, $topHits);
     }
 
-    /**
-     * @test
-     */
-    public function canGetTopKeywordsWithoutHitsNoResult()
+    #[Test]
+    public function canGetTopKeywordsWithoutHitsNoResult(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/statistics.csv');
         $fixtureTimestamp = 1480000000;
@@ -80,10 +75,8 @@ class StatisticsRepositoryTest extends IntegrationTestBase
         self::assertSame($expectedResult, $topHits);
     }
 
-    /**
-     * @test
-     */
-    public function canGetSearchStatisticsNoResult()
+    #[Test]
+    public function canGetSearchStatisticsNoResult(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/statistics.csv');
         $fixtureTimestamp = 1480000000;
@@ -98,10 +91,8 @@ class StatisticsRepositoryTest extends IntegrationTestBase
         self::assertSame($expectedResult, $topHits);
     }
 
-    /**
-     * @test
-     */
-    public function canSaveStatisticsRecord()
+    #[Test]
+    public function canSaveStatisticsRecord(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/statistics.csv');
         /** @var StatisticsRepository $repository */

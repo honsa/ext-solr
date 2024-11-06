@@ -18,18 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Opti
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Hierarchy\HierarchyFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Hierarchy\Node;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase to test the Node class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class NodeTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetHasParentNode()
+    #[Test]
+    public function canGetHasParentNode(): void
     {
         $facetMock = $this->createMock(HierarchyFacet::class);
         $node = new Node($facetMock);
@@ -42,10 +39,8 @@ class NodeTest extends SetUpUnitTestCase
         self::assertSame($parentNode, $node->getParentNode(), 'Node did not return assigend parent node');
     }
 
-    /**
-     * @test
-     */
-    public function canGetHasChildNodeSelectedReturnFalseWhenNoChildNodeWasAssigned()
+    #[Test]
+    public function canGetHasChildNodeSelectedReturnFalseWhenNoChildNodeWasAssigned(): void
     {
         $facetMock = $this->createMock(HierarchyFacet::class);
         $node = new Node($facetMock);
@@ -53,10 +48,8 @@ class NodeTest extends SetUpUnitTestCase
         self::assertFalse($node->getHasChildNodeSelected(), 'Node without childnodes should not indicate that it as a selected child node');
     }
 
-    /**
-     * @test
-     */
-    public function canGetHasChildNodeSelectedReturnFalseWhenNoSelectedChildNodeWasAssigned()
+    #[Test]
+    public function canGetHasChildNodeSelectedReturnFalseWhenNoSelectedChildNodeWasAssigned(): void
     {
         $facetMock = $this->createMock(HierarchyFacet::class);
         $node = new Node($facetMock);
@@ -67,10 +60,8 @@ class NodeTest extends SetUpUnitTestCase
         self::assertFalse($node->getHasChildNodeSelected(), 'Node with only unselected childnodes should not indicate that it has a selected child node');
     }
 
-    /**
-     * @test
-     */
-    public function canGetHasChildNodeSelectedReturnTrueWhenSelectedChildNodeWasAssigned()
+    #[Test]
+    public function canGetHasChildNodeSelectedReturnTrueWhenSelectedChildNodeWasAssigned(): void
     {
         $facetMock = $this->createMock(HierarchyFacet::class);
         $node = new Node($facetMock);

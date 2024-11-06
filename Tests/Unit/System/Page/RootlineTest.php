@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Page;
 
 use ApacheSolrForTypo3\Solr\System\Page\Rootline;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the ArrayAccessor helper class.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class RootlineTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function getRootPageIdReturnUidOfRootPage()
+    #[Test]
+    public function getRootPageIdReturnUidOfRootPage(): void
     {
         $testRootLineArray = [
             ['uid' => 100, 'pid' => 10, 'title' => 'level 2'],
@@ -40,28 +37,22 @@ class RootlineTest extends SetUpUnitTestCase
         self::assertSame(1, $rootline->getRootPageId(), 'GetRootPageId does not return expected root page id');
     }
 
-    /**
-     * @test
-     */
-    public function getRootPageIdReturnsZeroWhenNoSiteRootIsPresent()
+    #[Test]
+    public function getRootPageIdReturnsZeroWhenNoSiteRootIsPresent(): void
     {
         $rootline = new Rootline([]);
         self::assertSame(0, $rootline->getRootPageId(), 'Expecting null when no rootline given');
     }
 
-    /**
-     * @test
-     */
-    public function getHasRootPageReturnsFalseOnEmptyRootLine()
+    #[Test]
+    public function getHasRootPageReturnsFalseOnEmptyRootLine(): void
     {
         $rootline = new Rootline([]);
         self::assertFalse($rootline->getHasRootPage(), 'Expecting false when no rootline given');
     }
 
-    /**
-     * @test
-     */
-    public function getHasRootPageRturnsTrueWithGivenRootLine()
+    #[Test]
+    public function getHasRootPageRturnsTrueWithGivenRootLine(): void
     {
         $testRootLineArray = [
             ['uid' => 100, 'pid' => 10, 'title' => 'level 2'],
@@ -73,10 +64,8 @@ class RootlineTest extends SetUpUnitTestCase
         self::assertTrue($rootline->getHasRootPage(), 'Expecting true when rootline with rootpage given');
     }
 
-    /**
-     * @test
-     */
-    public function canGetParentPageIds()
+    #[Test]
+    public function canGetParentPageIds(): void
     {
         $testRootLineArray = [
             ['uid' => 100, 'pid' => 10, 'title' => 'level 2'],

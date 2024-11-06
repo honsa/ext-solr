@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Util;
 
 use ApacheSolrForTypo3\Solr\System\Util\ArrayAccessor;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the ArrayAccessor helper class.
- *
- * @author Timo Schmidt <timo.schmidt@dkd.de>
  */
 class ArrayAccessorTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGet()
+    #[Test]
+    public function canGet(): void
     {
         $data = ['foo' => ['bla' => 1]];
         $arrayAccessor = new ArrayAccessor($data);
@@ -44,10 +41,8 @@ class ArrayAccessorTest extends SetUpUnitTestCase
         self::assertNull($arrayAccessor->get('one:two:three:four'));
     }
 
-    /**
-     * @test
-     */
-    public function canSetAndGet()
+    #[Test]
+    public function canSetAndGet(): void
     {
         // can set and get a simple value
         $arrayAccessor = new ArrayAccessor();
@@ -61,10 +56,8 @@ class ArrayAccessorTest extends SetUpUnitTestCase
         self::assertSame('test2', $arrayAccessor->get('one:two:three:four'));
     }
 
-    /**
-     * @test
-     */
-    public function canReset()
+    #[Test]
+    public function canReset(): void
     {
         $data = ['one' => ['two' => ['a' => 111, 'b' => 222]]];
         // can set and get a simple value
@@ -78,10 +71,8 @@ class ArrayAccessorTest extends SetUpUnitTestCase
         self::assertSame(222, $arrayAccessor->get('one:two:b'));
     }
 
-    /**
-     * @test
-     */
-    public function resetIsRemovingEmptyNodes()
+    #[Test]
+    public function resetIsRemovingEmptyNodes(): void
     {
         $data = ['one' => ['two' => ['a' => 111, 'b' => 222]]];
         // can set and get a simple value
@@ -96,10 +87,8 @@ class ArrayAccessorTest extends SetUpUnitTestCase
         self::assertSame(['b' => 222], $arrayAccessor->get('one:two'));
     }
 
-    /**
-     * @test
-     */
-    public function resetIsRemovingSubNodesAndEmptyNodes()
+    #[Test]
+    public function resetIsRemovingSubNodesAndEmptyNodes(): void
     {
         $data = [
             'one' => [

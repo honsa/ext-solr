@@ -16,18 +16,15 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Unit;
 
 use ApacheSolrForTypo3\Solr\IndexQueue\AbstractIndexer;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for AbstractIndexer
- *
- * @author Timo Schmidt <timo.schmidt@dkd.de>
  */
 class AbstractIndexerTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function testTypeIsNotAllowedOverride()
+    #[Test]
+    public function testTypeIsNotAllowedOverride(): void
     {
         self::assertFalse(AbstractIndexer::isAllowedToOverrideField('type'), 'Type is allowed to override');
         self::assertTrue(AbstractIndexer::isAllowedToOverrideField('test_stringS'), 'New dynamic fields was not indicated to be overrideable');

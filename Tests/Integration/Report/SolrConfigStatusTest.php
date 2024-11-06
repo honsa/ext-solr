@@ -19,13 +19,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Report;
 
 use ApacheSolrForTypo3\Solr\Report\SolrConfigStatus;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Integration test for the config status report
- *
- * @author Timo Hund
  */
 class SolrConfigStatusTest extends IntegrationTestBase
 {
@@ -35,9 +34,7 @@ class SolrConfigStatusTest extends IntegrationTestBase
         $this->writeDefaultSolrTestSiteConfiguration();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetAGreenSolrConfigStatusAgainstTestServer(): void
     {
         /** @var SolrConfigStatus $schemaStatus */

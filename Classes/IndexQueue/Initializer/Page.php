@@ -20,7 +20,6 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Exception as DBALException;
-use PDO;
 use Throwable;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\Connection;
@@ -32,8 +31,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Index Queue initializer for pages which also covers resolution of mount
  * pages.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class Page extends AbstractInitializer
 {
@@ -124,6 +121,7 @@ class Page extends AbstractInitializer
                 // The page itself has its own content, which is handled like standard page.
                 $indexQueue = GeneralUtility::makeInstance(Queue::class);
                 $indexQueue->updateItem($this->type, $mountPoint['uid']);
+                $mountPointsInitialized = true;
             }
 
             // This can happen when the mount point does not show the content of the
@@ -162,7 +160,7 @@ class Page extends AbstractInitializer
     {
         $isValidMountPage = true;
 
-        if (empty($mountPoint['mountPageSource'])) {
+        if (!empty($mountPoint['mountPageOverlayed']) && empty($mountPoint['mountPageSource'])) {
             $isValidMountPage = false;
 
             $flashMessage = GeneralUtility::makeInstance(
@@ -175,7 +173,7 @@ class Page extends AbstractInitializer
             $this->flashMessageQueue->addMessage($flashMessage);
         }
 
-        if (!$this->mountedPageExists($mountPoint['mountPageSource'])) {
+        if (!empty($mountPoint['mountPageOverlayed']) && !$this->mountedPageExists($mountPoint['mountPageSource'])) {
             $isValidMountPage = false;
 
             $flashMessage = GeneralUtility::makeInstance(
@@ -237,7 +235,7 @@ class Page extends AbstractInitializer
 
         $mountIdentifier = $this->getMountPointIdentifier($mountProperties);
         $initializationQuery = 'INSERT INTO tx_solr_indexqueue_item (root, item_type, item_uid, indexing_configuration, indexing_priority, changed, has_indexing_properties, pages_mountidentifier, errors) '
-            . $this->buildSelectStatement() . ', 1, ' . $connection->quote($mountIdentifier, PDO::PARAM_STR) . ',""'
+            . $this->buildSelectStatement() . ', 1, ' . $connection->quote($mountIdentifier) . ',""'
             . 'FROM pages '
             . 'WHERE '
             . 'uid IN(' . implode(',', $mountedPagesThatNeedToBeAdded) . ') '

@@ -31,8 +31,6 @@ use TYPO3\CMS\Frontend\ContentObject\AbstractContentObject;
  *   removeEmptyValues = 1 # a flag to remove empty strings from the list, on by default.
  *   removeDuplicateValues = 1 # a flag to remove duplicate strings from the list, off by default.
  * }
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class Multivalue extends AbstractContentObject
 {
@@ -59,7 +57,7 @@ class Multivalue extends AbstractContentObject
             $data = $this->cObj->stdWrap($data, $conf);
         }
 
-        if (!array_key_exists('separator', $conf)) {
+        if (($conf['separator'] ?? '') === '') {
             $conf['separator'] = ',';
         }
 
@@ -70,7 +68,7 @@ class Multivalue extends AbstractContentObject
 
         $listAsArray = GeneralUtility::trimExplode(
             $conf['separator'],
-            $data,
+            $data ?? '',
             $removeEmptyValues
         );
 

@@ -16,7 +16,6 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Index\Queue\UpdateHandler\EventListener;
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\DataUpdateHandler;
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\AbstractBaseEventListener;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\Events\ProcessingFinishedEvent;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\ImmediateProcessingEventListener;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\ContentElementDeletedEvent;
@@ -28,6 +27,8 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\RecordMovedE
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\RecordUpdatedEvent;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\VersionSwappedEvent;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Traversable;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -35,15 +36,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Testcase for the ImmediateProcessingEventListener
  *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
+ * @property ImmediateProcessingEventListener $listener
  */
 class ImmediateProcessingEventListenerTest extends SetUpEventListener
 {
-    /**
-     * @var ImmediateProcessingEventListener
-     */
-    protected AbstractBaseEventListener $listener;
-
     protected function setUp(): void
     {
         if (!class_exists('SolrUnitTestsInvalidDataUpdateEvent')) {
@@ -55,10 +51,8 @@ class ImmediateProcessingEventListenerTest extends SetUpEventListener
         parent::setUp();
     }
 
-    /**
-     * @test
-     * @dataProvider canHandleEventsDataProvider
-     */
+    #[DataProvider('canHandleEventsDataProvider')]
+    #[Test]
     public function canHandleEvents(
         string $eventClass,
         string $handlerClass,
@@ -75,10 +69,8 @@ class ImmediateProcessingEventListenerTest extends SetUpEventListener
         $this->checkEventHandling($event, $handlerClass, $eventHandled);
     }
 
-    /**
-     * @test
-     * @dataProvider canHandleEventsDataProvider
-     */
+    #[DataProvider('canHandleEventsDataProvider')]
+    #[Test]
     public function canHandleEventsIfHandlingInactiveButForced(
         string $eventClass,
         string $handlerClass,

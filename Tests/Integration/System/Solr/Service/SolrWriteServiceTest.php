@@ -16,8 +16,10 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Integration\System\Solr\Service;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ExtractingQuery;
+use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
@@ -29,9 +31,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase to check if the solr write service is working as expected.
- *
- * @author Timo Hund
- * (c) 2010-2015 Timo Schmidt <timo.schmidt@dkd.de>
  */
 class SolrWriteServiceTest extends IntegrationTestBase
 {
@@ -57,12 +56,10 @@ class SolrWriteServiceTest extends IntegrationTestBase
         $solrConnectionInfo = $this->getSolrConnectionInfo();
         $client->createEndpoint(['host' => $solrConnectionInfo['host'], 'port' => $solrConnectionInfo['port'], 'path' => '/', 'core' => 'core_en', 'key' => 'admin'], true);
 
-        $this->solrWriteService = GeneralUtility::makeInstance(SolrWriteService::class, $client);
+        $this->solrWriteService = GeneralUtility::makeInstance(SolrWriteService::class, $client, new TypoScriptConfiguration([]));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canExtractByQuery(): void
     {
         $testFilePath = __DIR__ . '/Fixtures/testpdf.pdf';

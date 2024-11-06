@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Opti
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Hierarchy\HierarchyUrlDecoder;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for query parser range
- * @author Markus Goldbach
  */
 class HierarchyUrlDecoderTest extends SetUpUnitTestCase
 {
-    /**
-     * @var HierarchyUrlDecoder
-     */
-    protected $parser;
+    protected HierarchyUrlDecoder $parser;
 
     protected function setUp(): void
     {
@@ -36,10 +33,8 @@ class HierarchyUrlDecoderTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canParseHierarchy3LevelQuery()
+    #[Test]
+    public function canParseHierarchy3LevelQuery(): void
     {
         $expected = '"2-sport/skateboarding/street/"';
         $actual = $this->parser->decode('/sport/skateboarding/street/');
@@ -47,10 +42,8 @@ class HierarchyUrlDecoderTest extends SetUpUnitTestCase
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function canParseHierarchy3LevelQueryAndEscapedSlashes()
+    #[Test]
+    public function canParseHierarchy3LevelQueryAndEscapedSlashes(): void
     {
         $expected = '"2-sport/skateboarding\\\\/snowboarding/street/"';
         $actual = $this->parser->decode('/sport/skateboarding\/snowboarding/street/');
@@ -58,10 +51,8 @@ class HierarchyUrlDecoderTest extends SetUpUnitTestCase
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function canParseHierarchy2LevelQuery()
+    #[Test]
+    public function canParseHierarchy2LevelQuery(): void
     {
         $expected = '"1-sport/skateboarding/"';
         $actual = $this->parser->decode('/sport/skateboarding/');
@@ -69,10 +60,8 @@ class HierarchyUrlDecoderTest extends SetUpUnitTestCase
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function canParseHierarchy1LevelQuery()
+    #[Test]
+    public function canParseHierarchy1LevelQuery(): void
     {
         $expected = '"0-sport/"';
         $actual = $this->parser->decode('/sport/');

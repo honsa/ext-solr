@@ -20,29 +20,42 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\O
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Facet\Area\GroupViewHelper;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
+use TYPO3Fluid\Fluid\Core\Parser\SyntaxTree\ViewHelperNode;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\Variables\StandardVariableProvider;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class GroupViewHelperTest extends SetUpUnitTestCase
 {
     /**
-     * @test
+     * @throws MockObjectException
      */
-    public function canMakeOnlyExpectedFacetsAvailableInStaticContext()
+    #[Test]
+    public function canMakeOnlyExpectedFacetsAvailableInStaticContext(): void
     {
         $facetCollection = $this->getTestFacetCollection();
 
-        $variableContainer = $this->getMockBuilder(StandardVariableProvider::class)->onlyMethods(['remove'])->getMock();
+        $variableContainer = $this->getMockBuilder(StandardVariableProvider::class)
+            ->onlyMethods([
+                'remove',
+            ])
+            ->getMock();
         $renderingContextMock = $this->createMock(RenderingContextInterface::class);
-        $renderingContextMock->expects(self::any())->method('getVariableProvider')->willReturn($variableContainer);
+        $renderingContextMock
+            ->expects(self::any())
+            ->method('getVariableProvider')
+            ->willReturn($variableContainer);
 
         $testArguments['facets'] = $facetCollection;
         $testArguments['groupName'] = 'left';
 
-        GroupViewHelper::renderStatic($testArguments, function () {}, $renderingContextMock);
+        $groupViewHelperTestable = new GroupViewHelper();
+        $groupViewHelperTestable->setRenderingContext($renderingContextMock);
+        $viewHelperNodeMock = $this->createMock(ViewHelperNode::class);
+        $groupViewHelperTestable->setViewHelperNode($viewHelperNodeMock);
+        $groupViewHelperTestable->setArguments($testArguments);
+        $groupViewHelperTestable->render();
         self::assertTrue($variableContainer->exists('areaFacets'), 'Expected that filteredFacets has been set');
 
         /** @var FacetCollection $facetCollection */
@@ -54,18 +67,32 @@ class GroupViewHelperTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
+     * @throws MockObjectException
      */
-    public function canMakeOnlyExpectedFacetsAvailableInstanceContext()
+    #[Test]
+    public function canMakeOnlyExpectedFacetsAvailableInstanceContext(): void
     {
         $facetCollection = $this->getTestFacetCollection();
 
-        $variableContainer = $this->getMockBuilder(StandardVariableProvider::class)->onlyMethods(['remove'])->getMock();
+        $variableContainer = $this->getMockBuilder(StandardVariableProvider::class)
+            ->onlyMethods([
+                'remove',
+            ])
+            ->getMock();
         $renderingContextMock = $this->createMock(RenderingContextInterface::class);
-        $renderingContextMock->expects(self::any())->method('getVariableProvider')->willReturn($variableContainer);
+        $renderingContextMock
+            ->expects(self::any())
+            ->method('getVariableProvider')
+            ->willReturn($variableContainer);
 
-        $viewHelper = $this->getMockBuilder(GroupViewHelper::class)->onlyMethods(['renderChildren'])->getMock();
+        $viewHelper = $this->getMockBuilder(GroupViewHelper::class)
+            ->onlyMethods([
+                'renderChildren',
+            ])
+            ->getMock();
         $viewHelper->setRenderingContext($renderingContextMock);
+        $viewHelperNodeMock = $this->createMock(ViewHelperNode::class);
+        $viewHelper->setViewHelperNode($viewHelperNodeMock);
         $viewHelper->setArguments(['facets' => $facetCollection, 'groupName' => 'left']);
         $viewHelper->render();
 
@@ -80,9 +107,9 @@ class GroupViewHelperTest extends SetUpUnitTestCase
     }
 
     /**
-     * @return FacetCollection
+     * @throws MockObjectException
      */
-    protected function getTestFacetCollection()
+    protected function getTestFacetCollection(): FacetCollection
     {
         $facetCollection = new FacetCollection();
         $resultSetMock = $this->createMock(SearchResultSet::class);

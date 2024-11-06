@@ -22,6 +22,8 @@ use ApacheSolrForTypo3\Solr\Routing\RoutingService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Uri;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,9 +38,8 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 
 /**
  * Test case to validate the behaviour of the middle ware
- *
- * @author Lars Tode <lars.tode@dkd.de>
  */
+#[CoversClass(SolrRoutingMiddleware::class)]
 class SolrRoutingMiddlewareTest extends SetUpUnitTestCase
 {
     protected RoutingService|MockObject $routingServiceMock;
@@ -72,10 +73,7 @@ class SolrRoutingMiddlewareTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     * @covers \ApacheSolrForTypo3\Solr\Middleware\SolrRoutingMiddleware::process
-     */
+    #[Test]
     public function missingEnhancerHasNoEffectTest(): void
     {
         $serverRequest = new ServerRequest(
@@ -130,10 +128,7 @@ class SolrRoutingMiddlewareTest extends SetUpUnitTestCase
         );
     }
 
-    /**
-     * @test
-     * @covers \ApacheSolrForTypo3\Solr\Middleware\SolrRoutingMiddleware::process
-     */
+    #[Test]
     public function enhancerInactiveDuringIndexingTest(): void
     {
         $serverRequest = new ServerRequest(

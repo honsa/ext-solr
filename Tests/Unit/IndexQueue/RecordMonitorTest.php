@@ -22,6 +22,7 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\VersionSwapp
 use ApacheSolrForTypo3\Solr\IndexQueue\RecordMonitor;
 use ApacheSolrForTypo3\Solr\System\Configuration\ExtensionConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -31,17 +32,11 @@ use TYPO3\CMS\Core\Utility\RootlineUtility;
 
 /**
  * Testcase for the RecordMonitor class.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class RecordMonitorTest extends SetUpUnitTestCase
 {
     protected RecordMonitor $recordMonitor;
-
-    /**
-     * @var EventDispatcherInterface|MockObject
-     */
-    protected $eventDispatcherMock;
+    protected EventDispatcherInterface|MockObject $eventDispatcherMock;
 
     protected function setUp(): void
     {
@@ -74,9 +69,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_preProcessUHandlesDeletedContentElements(): void
     {
         $dispatchedEvent = null;
@@ -93,9 +86,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(123, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_preProcessIgnoresDraftWorkspace(): void
     {
         $GLOBALS['BE_USER']->workspace = 1;
@@ -105,9 +96,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         $this->recordMonitor->processCmdmap_preProcess('delete', 'tt_content', 123);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessUpdatesQueueItemForVersionSwapOfPageRecord(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -126,9 +115,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(4711, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessUpdatesQueueItemForVersionSwapOfRecord(): void
     {
         $dispatchedEvent = null;
@@ -145,9 +132,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(888, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessUpdatesQueueItemForMoveOfPageRecord(): void
     {
         $dispatchedEvent = null;
@@ -164,9 +149,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(4711, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessUpdatesQueueItemForMoveOfPageRecordInDraftWorkspace(): void
     {
         $GLOBALS['BE_USER']->workspace = 1;
@@ -177,9 +160,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         $this->recordMonitor->processCmdmap_postProcess('move', 'pages', 4711, []);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessUpdatesQueueItemForMoveOfRecord(): void
     {
         $dispatchedEvent = null;
@@ -196,10 +177,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(888, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     * For more infos, please refer https://github.com/TYPO3-Solr/ext-solr/pull/2836
-     */
+    #[Test]
     public function processDatamap_afterDatabaseOperationsUsesAlreadyResolvedNextAutoIncrementValueForNewStatus(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -218,10 +196,7 @@ class RecordMonitorTest extends SetUpUnitTestCase
         self::assertEquals(4711, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     * For more infos, please refer https://github.com/TYPO3-Solr/ext-solr/pull/2836
-     */
+    #[Test]
     public function processDatamap_afterDatabaseOperationsUsesNotYetResolvedNextAutoIncrementValueForNewStatus(): void
     {
         $newId = 'NEW1';

@@ -21,25 +21,18 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResult;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Domain\Search\Score\ScoreCalculationService;
 use ApacheSolrForTypo3\Solr\ViewHelpers\AbstractSolrFrontendViewHelper;
-use Closure;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 /**
  * Class DocumentScoreAnalyzerViewHelper
  *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
  *
  * @noinspection PhpUnused Used in {@link Resources/Private/Partials/Result/Document.html}
  */
 class DocumentScoreAnalyzerViewHelper extends AbstractSolrFrontendViewHelper
 {
-    use CompileWithRenderStatic;
-
     protected static ?ScoreCalculationService $scoreService = null;
 
     protected $escapeOutput = false;
@@ -57,7 +50,7 @@ class DocumentScoreAnalyzerViewHelper extends AbstractSolrFrontendViewHelper
      * @throws AspectNotFoundException
      * @noinspection PhpMissingReturnTypeInspection
      */
-    public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public function render()
     {
         $content = '';
         // only check whether a BE user is logged in, don't need to check
@@ -67,10 +60,10 @@ class DocumentScoreAnalyzerViewHelper extends AbstractSolrFrontendViewHelper
             return $content;
         }
 
-        $document = $arguments['document'];
+        $document = $this->arguments['document'];
 
         /** @var SearchResultSet $resultSet */
-        $resultSet = self::getUsedSearchResultSetFromRenderingContext($renderingContext);
+        $resultSet = self::getUsedSearchResultSetFromRenderingContext($this->renderingContext);
         $debugData = '';
         if (
             $resultSet->getUsedSearch()->getDebugResponse() !== null

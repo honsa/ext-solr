@@ -21,11 +21,11 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RequirementsService;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase to test the RequirementsService
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class RequirementsServiceTest extends SetUpUnitTestCase
 {
@@ -35,20 +35,16 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function getRequirementsMetReturnTrueWhenNothingConfigured()
+    #[Test]
+    public function getRequirementsMetReturnTrueWhenNothingConfigured(): void
     {
         $facet = $this->createMock(OptionsFacet::class);
         $service = new RequirementsService();
         self::assertTrue($service->getAllRequirementsMet($facet), 'Facet without any requirements should met all requirements');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsFalseWhenARequirementIsNotMet()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsFalseWhenARequirementIsNotMet(): void
     {
         $resultSet = new SearchResultSet();
         $colorConfig = [];
@@ -69,10 +65,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertFalse($service->getAllRequirementsMet($categoryFacet), 'Requirement is not met');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsTrueWhenRequirementIsMet()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsTrueWhenRequirementIsMet(): void
     {
         $resultSet = new SearchResultSet();
         $colorConfig = [];
@@ -98,10 +92,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertTrue($service->getAllRequirementsMet($categoryFacet), 'Requirement should be met, because color option is present, but is indicated to not be met');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsTrueWhenRequirementIsMetForMultipleFacets()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsTrueWhenRequirementIsMetForMultipleFacets(): void
     {
         $resultSet = new SearchResultSet();
         $colorFacet = new OptionsFacet($resultSet, 'mycolor', 'colors_stringM', 'Colors', []);
@@ -135,10 +127,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertTrue($service->getAllRequirementsMet($categoryFacet), 'Requirement should be met, because color and size option is present, but is indicated to not be met');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsFalseWhenOnlyOneConfiguredRequirementIsMet()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsFalseWhenOnlyOneConfiguredRequirementIsMet(): void
     {
         $resultSet = new SearchResultSet();
         $colorFacet = new OptionsFacet($resultSet, 'mycolor', 'colors_stringM', 'Colors', []);
@@ -169,10 +159,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertFalse($service->getAllRequirementsMet($categoryFacet), 'Requirement should not be met since the matchesSize requirement is not met.');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsFalseWhenRequiredFacetHasADifferentValue()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsFalseWhenRequiredFacetHasADifferentValue(): void
     {
         $resultSet = new SearchResultSet();
         $colorConfig = [];
@@ -197,10 +185,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertFalse($service->getAllRequirementsMet($categoryFacet), 'Requirement should not be met because the facet has not the require value');
     }
 
-    /**
-     * @test
-     */
-    public function getAllRequirementsMetIsReturnsFalseIfRequiredFacetValueIsNotSelected()
+    #[Test]
+    public function getAllRequirementsMetIsReturnsFalseIfRequiredFacetValueIsNotSelected(): void
     {
         $resultSet = new SearchResultSet();
         $colorConfig = [];
@@ -225,10 +211,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         self::assertFalse($service->getAllRequirementsMet($categoryFacet), 'Requirement should not be met because the required option is not selected');
     }
 
-    /**
-     * @test
-     */
-    public function exceptionIsThrownForRequirementWithNotExistingFacet()
+    #[Test]
+    public function exceptionIsThrownForRequirementWithNotExistingFacet(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Requirement for unexisting facet configured');
@@ -248,10 +232,8 @@ class RequirementsServiceTest extends SetUpUnitTestCase
         $service->getAllRequirementsMet($categoryFacet);
     }
 
-    /**
-     * @test
-     */
-    public function canNegateRequirementsResult()
+    #[Test]
+    public function canNegateRequirementsResult(): void
     {
         $resultSet = new SearchResultSet();
         $colorConfig = [];

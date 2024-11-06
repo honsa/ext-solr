@@ -19,12 +19,11 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\O
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\OptionsFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Unit test for the OptionsFacet
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class OptionCollectionTest extends SetUpUnitTestCase
 {
@@ -34,10 +33,8 @@ class OptionCollectionTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function canGetManualSortedCopy()
+    #[Test]
+    public function canGetManualSortedCopy(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new OptionsFacet($searchResultSetMock, 'colors', 'colors_s');
@@ -58,10 +55,8 @@ class OptionCollectionTest extends SetUpUnitTestCase
         self::assertSame($red, $sortedOptions->getByPosition(2), 'First sorted item was not blue');
     }
 
-    /**
-     * @test
-     */
-    public function canGetLabelPrefixes()
+    #[Test]
+    public function canGetLabelPrefixes(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new OptionsFacet($searchResultSetMock, 'colors', 'colors_s');
@@ -83,10 +78,8 @@ class OptionCollectionTest extends SetUpUnitTestCase
         self::assertSame(['r', 'p', 'l'], $labelPrefixes, 'Can not get expected label prefixes');
     }
 
-    /**
-     * @test
-     */
-    public function canGetByLowercaseLabelPrefix()
+    #[Test]
+    public function canGetByLowercaseLabelPrefix(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new OptionsFacet($searchResultSetMock, 'colors', 'colors_s');
@@ -112,10 +105,8 @@ class OptionCollectionTest extends SetUpUnitTestCase
         self::assertCount(3, $optionsStartingWithR, 'Unexpected amount of options starting with r');
     }
 
-    /**
-     * @test
-     */
-    public function canGetByLowercaseLabelPrefixWithMultiByteCharacter()
+    #[Test]
+    public function canGetByLowercaseLabelPrefixWithMultiByteCharacter(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new OptionsFacet($searchResultSetMock, 'authors', 'authors_s');
@@ -131,10 +122,8 @@ class OptionCollectionTest extends SetUpUnitTestCase
         self::assertCount(1, $optionsStartingWithO, 'Unexpected amount of options starting with ø');
     }
 
-    /**
-     * @test
-     */
-    public function canGetByValueAfterManualSorting()
+    #[Test]
+    public function canGetByValueAfterManualSorting(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new OptionsFacet($searchResultSetMock, 'colors', 'colors_s');

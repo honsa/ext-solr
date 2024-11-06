@@ -17,19 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rang
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\DateRange\DateRangeUrlDecoder;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for query parser range
- *
- * @author Markus Goldbach
  */
 class DateRangeUrlDecoderTest extends SetUpUnitTestCase
 {
-    /**
-     * @var DateRangeUrlDecoder
-     */
-    protected $rangeParser;
+    protected DateRangeUrlDecoder $rangeParser;
 
     protected function setUp(): void
     {
@@ -37,30 +33,24 @@ class DateRangeUrlDecoderTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canParseDateRangeQuery()
+    #[Test]
+    public function canParseDateRangeQuery(): void
     {
         $expected = '[2010-01-01T00:00:00Z TO 2010-01-31T23:59:59Z]';
         $actual = $this->rangeParser->decode('201001010000-201001312359');
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function canParseMinOpenDateRangeQuery()
+    #[Test]
+    public function canParseMinOpenDateRangeQuery(): void
     {
         $expected = '[* TO 2010-01-31T23:59:59Z]';
         $actual = $this->rangeParser->decode('-201001312359');
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function canParseMaxOpenDateRangeQuery()
+    #[Test]
+    public function canParseMaxOpenDateRangeQuery(): void
     {
         $expected = '[2010-01-01T00:00:00Z TO *]';
         $actual = $this->rangeParser->decode('201001010000-');

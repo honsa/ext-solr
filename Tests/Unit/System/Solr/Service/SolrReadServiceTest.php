@@ -23,6 +23,8 @@ use ApacheSolrForTypo3\Solr\System\Solr\SolrCommunicationException;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrInternalServerErrorException;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrUnavailableException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Solarium\Client;
 use Solarium\Core\Client\Request;
@@ -33,8 +35,6 @@ use Traversable;
 
 /**
  * Tests the ApacheSolrForTypo3\Solr\SolrService class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SolrReadServiceTest extends SetUpUnitTestCase
 {
@@ -55,10 +55,8 @@ class SolrReadServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function pingIsOnlyDoingOnePingCallWhenCacheIsEnabled()
+    #[Test]
+    public function pingIsOnlyDoingOnePingCallWhenCacheIsEnabled(): void
     {
         // we fake a 200 OK response and expect that
         $this->responseMock->expects(self::once())->method('getStatusCode')->willReturn(200);
@@ -67,10 +65,8 @@ class SolrReadServiceTest extends SetUpUnitTestCase
         $this->service->ping();
     }
 
-    /**
-     * @test
-     */
-    public function pingIsOnlyDoingManyPingCallsWhenCacheIsDisabled()
+    #[Test]
+    public function pingIsOnlyDoingManyPingCallsWhenCacheIsDisabled(): void
     {
         // we fake a 200 OK response and expect that
         $this->responseMock->expects(self::exactly(2))->method('getStatusCode')->willReturn(200);
@@ -79,10 +75,8 @@ class SolrReadServiceTest extends SetUpUnitTestCase
         $this->service->ping(false);
     }
 
-    /**
-     * @test
-     */
-    public function searchMethodIsTriggeringGetRequest()
+    #[Test]
+    public function searchMethodIsTriggeringGetRequest(): void
     {
         $this->responseMock->expects(self::once())->method('getStatusCode')->willReturn(200);
         $this->clientMock->expects(self::once())->method('createRequest')->willReturn($this->createMock(Request::class));
@@ -97,19 +91,17 @@ class SolrReadServiceTest extends SetUpUnitTestCase
 
     public static function readServiceExceptionDataProvider(): Traversable
     {
-        yield 'Communication error' => ['exceptionClass' => SolrUnavailableException::class, 0];
-        yield 'Internal Server error' => ['exceptionClass' => SolrInternalServerErrorException::class, 500];
-        yield 'Other unspecific error' => ['exceptionClass' => SolrCommunicationException::class, 555];
+        yield 'Communication error' => ['exceptionClass' => SolrUnavailableException::class, 'statusCode' => 0];
+        yield 'Internal Server error' => ['exceptionClass' => SolrInternalServerErrorException::class, 'statusCode' => 500];
+        yield 'Other unspecific error' => ['exceptionClass' => SolrCommunicationException::class, 'statusCode' => 555];
     }
 
-    /**
-     * @dataProvider readServiceExceptionDataProvider
-     * @test
-     */
+    #[DataProvider('readServiceExceptionDataProvider')]
+    #[Test]
     public function searchThrowsExpectedExceptionForStatusCode(
         string $exceptionClass,
         int $statusCode
-    ) {
+    ): void {
         $this->responseMock->expects(self::any())->method('getStatusCode')->willReturn($statusCode);
         $this->clientMock->expects(self::once())->method('createRequest')->willReturn($this->createMock(Request::class));
 

@@ -27,39 +27,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Abstract testcase for the update handlers
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 abstract class SetUpUpdateHandler extends SetUpUnitTestCase
 {
-    /**
-     * @var ConfigurationAwareRecordService|MockObject
-     */
-    protected $recordServiceMock;
-
-    /**
-     * @var FrontendEnvironment|MockObject
-     */
-    protected $frontendEnvironmentMock;
-
-    /**
-     * @var TypoScriptConfiguration|MockObject
-     */
-    protected $typoScriptConfigurationMock;
-
-    /**
-     * @var TCAService|MockObject
-     */
-    protected $tcaServiceMock;
-
-    /**
-     * @var Queue|MockObject
-     */
-    protected $indexQueueMock;
-
-    /**
-     * @var PagesRepository|MockObject
-     */
+    protected ConfigurationAwareRecordService|MockObject $recordServiceMock;
+    protected FrontendEnvironment|MockObject $frontendEnvironmentMock;
+    protected TypoScriptConfiguration|MockObject $typoScriptConfigurationMock;
+    protected TCAService|MockObject $tcaServiceMock;
+    protected Queue|MockObject $indexQueueMock;
     protected PagesRepository|MockObject $pagesRepositoryMock;
 
     protected function setUp(): void

@@ -24,8 +24,6 @@ use UnexpectedValueException;
 /**
  * The LastSearchesService is responsible to return the LastSearches from the session or database,
  * depending on the configuration.
- *
- * @author Timo Schmidt <timo.schmidt@dkd.de>
  */
 class LastSearchesService
 {
@@ -83,9 +81,11 @@ class LastSearchesService
             case 'global':
                 $this->lastSearchesRepository->add($keywords, $this->configuration->getSearchLastSearchesLimit());
                 break;
+            case 'disabled':
+                break;
             default:
                 throw new UnexpectedValueException(
-                    'Unknown mode for plugin.tx_solr.search.lastSearches.mode, valid modes are "user" or "global".',
+                    'Unknown mode for plugin.tx_solr.search.lastSearches.mode, valid modes are "user", "global" or "disabled".',
                     1342456570
                 );
         }

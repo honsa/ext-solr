@@ -19,30 +19,24 @@ use ApacheSolrForTypo3\Solr\Controller\Backend\Search\IndexAdministrationModuleC
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrAdminService;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Solarium\Core\Client\Endpoint;
 
 /**
  * Testcase for IndexQueueModuleController
  *
- * @author Timo Hund <timo.hund@dkd.de>
+ * @property IndexAdministrationModuleController|MockObject $controller
  */
-class IndexAdministrationModuleControllerTest extends AbstractModuleController
+class IndexAdministrationModuleControllerTest extends SetUpSolrModuleControllerTestCase
 {
-    /**
-     * @var IndexAdministrationModuleController|MockObject
-     */
-    protected $controller;
-
     protected function setUp(): void
     {
         parent::setUpConcreteModuleController(IndexAdministrationModuleController::class);
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testReloadIndexConfigurationAction(): void
     {
         $responseMock = $this->createMock(ResponseAdapter::class);

@@ -20,12 +20,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rang
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\NumericRange\NumericRangeFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\NumericRange\NumericRangeFacetParser;
 use ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\SetUpFacetParser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 
 /**
  * Class DateRangeFacetParserTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class NumericRangeFacetParserTest extends SetUpFacetParser
 {
@@ -70,10 +70,8 @@ class NumericRangeFacetParserTest extends SetUpFacetParser
         return $facet;
     }
 
-    /**
-     * @test
-     */
-    public function facetIsCreated()
+    #[Test]
+    public function facetIsCreated(): void
     {
         $facetConfiguration = $this->getPageIdFacetConfiguration();
         $facet = $this->getNumericRangeFacet($facetConfiguration, ['myPids:10-98'], 'myPids');
@@ -103,10 +101,9 @@ class NumericRangeFacetParserTest extends SetUpFacetParser
 
     /**
      * Test the parsing of the active range values
-     *
-     * @dataProvider canParseActiveFacetValuesProvider
-     * @test
      */
+    #[DataProvider('canParseActiveFacetValuesProvider')]
+    #[Test]
     public function canParseActiveFacetValues(int $startRequested, int $endRequested): void
     {
         $facetConfiguration = $this->getPageIdFacetConfiguration();

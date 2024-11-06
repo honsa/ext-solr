@@ -19,6 +19,7 @@ namespace ApacheSolrForTypo3\Solr\EventListener\PageIndexer;
 
 use ApacheSolrForTypo3\Solr\Access\Rootline;
 use ApacheSolrForTypo3\Solr\IndexQueue\FrontendHelper\AuthorizationService;
+use ApacheSolrForTypo3\Solr\IndexQueue\FrontendHelper\PageIndexer;
 use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerRequest;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use TYPO3\CMS\Core\Http\JsonResponse;
@@ -29,6 +30,8 @@ use TYPO3\CMS\Frontend\Authentication\ModifyResolvedFrontendGroupsEvent;
 /**
  * Class FrontendGroupsModifier is responsible to fake the fe_groups to make
  * the indexing of access restricted pages and content elements.
+ *
+ * This class is involved only on {@link PageIndexer} processing.
  */
 class FrontendGroupsModifier
 {
@@ -40,15 +43,22 @@ class FrontendGroupsModifier
     public function __invoke(ModifyResolvedFrontendGroupsEvent $event): void
     {
         $pageIndexerRequest = $event->getRequest()->getAttribute('solr.pageIndexingInstructions');
-        if (!$pageIndexerRequest instanceof PageIndexerRequest
-            || (
-                (int)$pageIndexerRequest->getParameter('userGroup') === 0
-                && (
-                    (int)$pageIndexerRequest->getParameter('pageUserGroup') !== -2
-                    &&
-                    (int)$pageIndexerRequest->getParameter('pageUserGroup') < 1
-                )
+        if (
+            !$pageIndexerRequest instanceof PageIndexerRequest
+            || !in_array(PageIndexer::ACTION_NAME, $pageIndexerRequest->getActions())) {
+            return;
+        }
+
+        $groups = $this->resolveFrontendUserGroups($pageIndexerRequest);
+
+        $noRelevantFrontendUserGroupResolved = empty($groups) || (count($groups) === 1 && $groups[0] === 0);
+        if ((int)$pageIndexerRequest->getParameter('userGroup') === 0
+            && (
+                (int)$pageIndexerRequest->getParameter('pageUserGroup') !== -2
+                &&
+                (int)$pageIndexerRequest->getParameter('pageUserGroup') < 1
             )
+            && $noRelevantFrontendUserGroupResolved
         ) {
             return;
         }
@@ -76,7 +86,6 @@ class FrontendGroupsModifier
             );
         }
 
-        $groups = $this->resolveFrontendUserGroups($pageIndexerRequest);
         if ((int)$pageIndexerRequest->getParameter('pageUserGroup') > 0) {
             $groups[] = (int)$pageIndexerRequest->getParameter('pageUserGroup');
         }

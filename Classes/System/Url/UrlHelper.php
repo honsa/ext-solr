@@ -19,8 +19,6 @@ use TYPO3\CMS\Core\Http\Uri;
 
 /**
  * Class UrlHelper
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class UrlHelper extends Uri
 {
@@ -50,10 +48,7 @@ class UrlHelper extends Uri
     {
         parse_str($this->query, $parameters);
         $parameters[$parameterName] = $value;
-        $query = '';
-        if (!empty($parameters)) {
-            $query = http_build_query($parameters);
-        }
+        $query = http_build_query($parameters);
         $query = $this->sanitizeQuery($query);
         $clonedObject = clone $this;
         $clonedObject->query = $query;

@@ -19,13 +19,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\SortingExpression;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 
 /**
  * Unit test for the SortingExpression
- *
- * @author Timo Hund <timo.hund@dkd.de>
- * @author Jens Jacobsen <jens.jacobsen@ueberbit.de>
  */
 class SortingExpressionTest extends SetUpUnitTestCase
 {
@@ -79,10 +78,10 @@ class SortingExpressionTest extends SetUpUnitTestCase
      * @param string $direction
      * @param bool $isJson
      * @param string $expectedResult
-     * @dataProvider canBuildSortExpressionDataProvider
-     * @test
      */
-    public function canBuildSortExpression($sorting, string $direction, bool $isJson, string $expectedResult)
+    #[DataProvider('canBuildSortExpressionDataProvider')]
+    #[Test]
+    public function canBuildSortExpression($sorting, string $direction, bool $isJson, string $expectedResult): void
     {
         $expression = new SortingExpression();
         if ($isJson) {

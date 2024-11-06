@@ -18,10 +18,8 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rend
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RenderingInstructions\FormatDate;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class FormatDateTest extends SetUpUnitTestCase
 {
     public function setUp(): void
@@ -31,10 +29,10 @@ class FormatDateTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
      * @throws Exception
      */
-    public function canFormatUsingDefaultFormat()
+    #[Test]
+    public function canFormatUsingDefaultFormat(): void
     {
         $processingInstruction = new FormatDate();
         $result = $processingInstruction->format('2015-11-17T17:16:10Z', []);
@@ -42,11 +40,10 @@ class FormatDateTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
-     *
      * @throws Exception
      */
-    public function canPassCustomOutputFormat()
+    #[Test]
+    public function canPassCustomOutputFormat(): void
     {
         $processingInstruction = new FormatDate();
         $result = $processingInstruction->format('2015-11-17T17:16:10Z', ['outputFormat' => 'd.m.Y']);
@@ -54,11 +51,10 @@ class FormatDateTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
-     *
      * @throws Exception
      */
-    public function canParseTimestampAsInputValue()
+    #[Test]
+    public function canParseTimestampAsInputValue(): void
     {
         $processingInstruction = new FormatDate();
         $fiveDays = (60 * 60 * 24 * 5) - 1;

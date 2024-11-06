@@ -18,6 +18,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Solr\Service;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrAdminService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Solarium\Client;
 use Solarium\Core\Client\Endpoint;
@@ -27,8 +28,6 @@ use function json_encode;
 
 /**
  * Tests the SolrAdminService class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SolrAdminServiceTest extends SetUpUnitTestCase
 {
@@ -51,9 +50,7 @@ class SolrAdminServiceTest extends SetUpUnitTestCase
         $this->adminService = $this->getMockBuilder(SolrAdminService::class)->setConstructorArgs([$this->clientMock])->onlyMethods(['_sendRawGet'])->getMock();
         parent::setUp();
     }
-    /**
-     * @test
-     */
+    #[Test]
     public function getLukeMetaDataIsSendingRequestToExpectedUrl(): void
     {
         $fakedLukeResponse = $this->createMock(ResponseAdapter::class);
@@ -63,9 +60,7 @@ class SolrAdminServiceTest extends SetUpUnitTestCase
         self::assertSame($fakedLukeResponse, $result, 'Could not get expected result from getLukeMetaData');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getPluginsInformation(): void
     {
         $fakePluginsResponse = $this->createMock(ResponseAdapter::class);
@@ -74,9 +69,7 @@ class SolrAdminServiceTest extends SetUpUnitTestCase
         self::assertSame($fakePluginsResponse, $result, 'Could not get expected result from getPluginsInformation');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getSystemInformation(): void
     {
         $fakeSystemInformationResponse = $this->createMock(ResponseAdapter::class);
@@ -85,9 +78,7 @@ class SolrAdminServiceTest extends SetUpUnitTestCase
         self::assertSame($fakeSystemInformationResponse, $result, 'Could not get expected result from getSystemInformation');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getSolrServerVersion(): void
     {
         $fakeRawResponse = new stdClass();
@@ -102,9 +93,7 @@ class SolrAdminServiceTest extends SetUpUnitTestCase
         self::assertSame('6.2.1', $result, 'Can not get solr version from faked response');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetSolrConfigNameFromFakedXmlResponse(): void
     {
         $fakeTestSchema = self::getFixtureContentByName('solrconfig.xml');

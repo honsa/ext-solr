@@ -15,8 +15,13 @@
 
 namespace ApacheSolrForTypo3\Solr\Tests\Integration\System\Solr\Service;
 
+use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
+use ApacheSolrForTypo3\Solr\PingFailedException;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrAdminService;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use Solarium\Client;
 use Solarium\Core\Client\Adapter\Curl;
 use Traversable;
@@ -25,16 +30,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase to check if the solr admin service is working as expected.
- *
- * @author Timo Hund
  */
 class SolrAdminServiceTest extends IntegrationTestBase
 {
-    /**
-     * @var SolrAdminService
-     */
-    protected $solrAdminService;
+    protected SolrAdminService $solrAdminService;
 
+    /**
+     * @throws MockObjectException
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,25 +57,21 @@ class SolrAdminServiceTest extends IntegrationTestBase
 
     public static function synonymDataProvider(): Traversable
     {
-        yield 'normal' => ['baseword' => 'homepage', 'synonyms' => ['website']];
-        yield 'umlaut' => ['baseword' => 'früher', 'synonyms' => ['vergangenheit']];
-        yield '"' => ['baseword' => '"', 'synonyms' => ['quote mark']];
-        yield '%' => ['baseword' => '%', 'synonyms' => ['percent']];
-        yield '#' => ['baseword' => '#', 'synonyms' => ['hashtag']];
-        yield ':' => ['baseword' => ':', 'synonyms' => ['colon']];
-        yield ';' => ['baseword' => ';', 'synonyms' => ['semicolon']];
+        yield 'normal' => ['baseWord' => 'homepage', 'synonyms' => ['website']];
+        yield 'umlaut' => ['baseWord' => 'früher', 'synonyms' => ['vergangenheit']];
+        yield '"' => ['baseWord' => '"', 'synonyms' => ['quote mark']];
+        yield '%' => ['baseWord' => '%', 'synonyms' => ['percent']];
+        yield '#' => ['baseWord' => '#', 'synonyms' => ['hashtag']];
+        yield ':' => ['baseWord' => ':', 'synonyms' => ['colon']];
+        yield ';' => ['baseWord' => ';', 'synonyms' => ['semicolon']];
 
         // '/' still persists in https://issues.apache.org/jira/browse/SOLR-6853
-        //yield '/' => ['baseword' => '/', 'synonyms' => ['slash']]
+        //yield '/' => ['baseWord' => '/', 'synonyms' => ['slash']]
     }
 
-    /**
-     * @param string $baseWord
-     * @param array $synonyms
-     * @dataProvider synonymDataProvider
-     * @test
-     */
-    public function canAddAndDeleteSynonym($baseWord, $synonyms = [])
+    #[DataProvider('synonymDataProvider')]
+    #[Test]
+    public function canAddAndDeleteSynonym(string $baseWord, array $synonyms = []): void
     {
         $this->solrAdminService->deleteSynonym($baseWord);
         $this->solrAdminService->reloadCore();
@@ -96,15 +95,16 @@ class SolrAdminServiceTest extends IntegrationTestBase
 
     public static function stopWordDataProvider(): Traversable
     {
-        yield 'normal' => ['stopword' => 'badword'];
-        yield 'umlaut' => ['stopword' => 'frühaufsteher'];
+        yield 'normal' => ['stopWord' => 'badword'];
+        yield 'umlaut' => ['stopWord' => 'frühaufsteher'];
     }
 
     /**
-     * @test
-     * @dataProvider stopWordDataProvider
+     * @throws InvalidArgumentException
      */
-    public function canAddStopWord($stopWord)
+    #[DataProvider('stopWordDataProvider')]
+    #[Test]
+    public function canAddStopWord(string $stopWord): void
     {
         $stopWords = $this->solrAdminService->getStopWords();
 
@@ -126,57 +126,49 @@ class SolrAdminServiceTest extends IntegrationTestBase
 
     /**
      * Check if the default stopswords are stored in the solr server.
-     *
-     * @test
      */
-    public function containsDefaultStopWord()
+    #[Test]
+    public function containsDefaultStopWord(): void
     {
         $stopWordsInSolr = $this->solrAdminService->getStopWords();
         self::assertContains('and', $stopWordsInSolr, 'Default stopword and was not present');
     }
 
-    /**
-     * @test
-     */
-    public function canGetSystemInformation()
+    #[Test]
+    public function canGetSystemInformation(): void
     {
         $informationResponse = $this->solrAdminService->getSystemInformation();
         self::assertSame(200, $informationResponse->getHttpStatus(), 'Could not get information response from solr server');
     }
 
     /**
-     * @test
+     * @throws PingFailedException
      */
-    public function canGetPingRoundtrimRunTime()
+    #[Test]
+    public function canGetPingRoundtrimRunTime(): void
     {
         $pingRuntime = $this->solrAdminService->getPingRoundTripRuntime();
         self::assertGreaterThan(0, $pingRuntime, 'Ping runtime should be larger then 0');
         self::assertTrue(is_float($pingRuntime), 'Ping runtime should be an integer');
     }
 
-    /**
-     * @test
-     */
-    public function canGetSolrServiceVersion()
+    #[Test]
+    public function canGetSolrServiceVersion(): void
     {
         $solrServerVersion = $this->solrAdminService->getSolrServerVersion();
         $isVersionHigherSix = version_compare('6.0.0', $solrServerVersion, '<');
         self::assertTrue($isVersionHigherSix, 'Expecting to run on version larger then 6.0.0');
     }
 
-    /**
-     * @test
-     */
-    public function canReloadCore()
+    #[Test]
+    public function canReloadCore(): void
     {
         $result = $this->solrAdminService->reloadCore();
         self::assertSame(200, $result->getHttpStatus(), 'Reload core did not responde with a 200 ok status');
     }
 
-    /**
-     * @test
-     */
-    public function canGetPluginsInformation()
+    #[Test]
+    public function canGetPluginsInformation(): void
     {
         $result = $this->solrAdminService->getPluginsInformation();
         self::assertSame(0, $result->responseHeader->status);
@@ -184,9 +176,10 @@ class SolrAdminServiceTest extends IntegrationTestBase
     }
 
     /**
-     * @test
+     * @throws MockObjectException
      */
-    public function canParseLanguageFromSchema()
+    #[Test]
+    public function canParseLanguageFromSchema(): void
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcher::class);

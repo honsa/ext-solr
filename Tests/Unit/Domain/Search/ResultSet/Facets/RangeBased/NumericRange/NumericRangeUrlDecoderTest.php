@@ -18,24 +18,17 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rang
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\NumericRange\NumericRangeUrlDecoder;
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for query parser range
- *
- * @author Markus Goldbach <markus.goldbach@dkd.de>
- * @author Ingo Renner <ingo@typo3.org>
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 class NumericRangeUrlDecoderTest extends SetUpUnitTestCase
 {
-    /**
-     * Parser to build Solr range queries
-     *
-     * @var NumericRangeUrlDecoder
-     */
-    protected $rangeParser;
+    protected NumericRangeUrlDecoder $rangeParser;
 
     protected function setUp(): void
     {
@@ -48,22 +41,22 @@ class NumericRangeUrlDecoderTest extends SetUpUnitTestCase
      */
     public static function rangeQueryParsingDataProvider(): Traversable
     {
-        yield '50/100' => ['firstValue' => '50', 'secondValue' => '100', 'expected' => '[50 TO 100]'];
-        yield '-10/20' => ['firstValue' => '-10', 'secondValue' => '20', 'expected' => '[-10 TO 20]'];
-        yield '-10/-5' => ['firstValue' => '-10', 'secondValue' => '-5', 'expected' => '[-10 TO -5]'];
+        yield '50/100' => ['firstValue' => '50', 'secondValue' => '100', 'expectedResult' => '[50 TO 100]'];
+        yield '-10/20' => ['firstValue' => '-10', 'secondValue' => '20', 'expectedResult' => '[-10 TO 20]'];
+        yield '-10/-5' => ['firstValue' => '-10', 'secondValue' => '-5', 'expectedResult' => '[-10 TO -5]'];
     }
 
     /**
      * Test the filter decoding
      *
-     * @dataProvider rangeQueryParsingDataProvider
-     * @test
      *
      * @param string $firstValue
      * @param string $secondValue
      * @param string $expectedResult
      */
-    public function canParseRangeQuery(string $firstValue, string $secondValue, string $expectedResult)
+    #[DataProvider('rangeQueryParsingDataProvider')]
+    #[Test]
+    public function canParseRangeQuery(string $firstValue, string $secondValue, string $expectedResult): void
     {
         $actual = $this->rangeParser->decode($firstValue . '-' . $secondValue);
         self::assertEquals($expectedResult, $actual);
@@ -71,10 +64,9 @@ class NumericRangeUrlDecoderTest extends SetUpUnitTestCase
 
     /**
      * Test the handling of invalid parameters
-     *
-     * @test
      */
-    public function canHandleInvalidParameters()
+    #[Test]
+    public function canHandleInvalidParameters(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->rangeParser->decode('invalid-value');

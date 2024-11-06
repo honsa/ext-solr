@@ -24,67 +24,47 @@ use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Routing\PageArguments;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Unit test case for the StatisticsWriterProcessor.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class StatisticsWriterProcessorTest extends SetUpUnitTestCase
 {
-    /**
-     * @var StatisticsRepository|MockObject
-     */
-    protected $statisticsRepositoryMock;
-
-    /**
-     * @var SiteRepository|MockObject
-     */
-    protected $siteRepositoryMock;
-
-    /**
-     * @var StatisticsWriterProcessor|MockObject
-     */
-    protected $processor;
-
-    /**
-     * @var TypoScriptConfiguration|MockObject
-     */
-    protected $typoScriptConfigurationMock;
-
-    /**
-     * @var SearchRequest|MockObject
-     */
-    protected $searchRequestMock;
-
-    /**
-     * @var Query|MockObject
-     */
-    protected $queryMock;
+    protected StatisticsRepository|MockObject $statisticsRepositoryMock;
+    protected SiteRepository|MockObject $siteRepositoryMock;
+    protected StatisticsWriterProcessor|MockObject $processor;
+    protected TypoScriptConfiguration|MockObject $typoScriptConfigurationMock;
+    protected SearchRequest|MockObject $searchRequestMock;
+    protected Query|MockObject $queryMock;
 
     protected function setUp(): void
     {
         $this->statisticsRepositoryMock = $this->getMockBuilder(StatisticsRepository::class)->onlyMethods(['saveStatisticsRecord'])->getMock();
 
         $this->siteRepositoryMock = $this->createMock(SiteRepository::class);
-        $this->processor = $this->getMockBuilder(StatisticsWriterProcessor::class)->setConstructorArgs([$this->statisticsRepositoryMock, $this->siteRepositoryMock])->onlyMethods(['getTSFE', 'getTime', 'getUserIp'])->getMock();
+        $this->processor = $this->getMockBuilder(StatisticsWriterProcessor::class)->setConstructorArgs([$this->statisticsRepositoryMock, $this->siteRepositoryMock])->onlyMethods(['getTime', 'getUserIp'])->getMock();
         $this->typoScriptConfigurationMock = $this->createMock(TypoScriptConfiguration::class);
         $this->searchRequestMock = $this->createMock(SearchRequest::class);
         $this->queryMock = $this->createMock(Query::class);
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canWriteExpectedStatisticsData()
+    #[Test]
+    public function canWriteExpectedStatisticsData(): void
     {
-        $fakeTSFE = $this->createMock(TypoScriptFrontendController::class);
-        $fakeTSFE->fe_user = $this->createMock(FrontendUserAuthentication::class);
-        $fakeTSFE->id = 888;
+        $serverRequest = (new ServerRequest('https://typo3-solr.com/', 'GET'))
+            ->withAttribute('frontend.user', $this->createMock(FrontendUserAuthentication::class))
+            ->withAttribute('routing', new PageArguments(888, '0', []))
+            ->withAttribute('language', new SiteLanguage(0, 'en-US', new Uri('https://typo3-solr.com/'), []));
+        $GLOBALS['TYPO3_REQUEST'] = $serverRequest;
+
         $fakeTime = 100;
         $fakeIP = '192.168.2.22';
 
@@ -92,7 +72,6 @@ class StatisticsWriterProcessorTest extends SetUpUnitTestCase
         $fakeSite->expects(self::once())->method('getRootPageId')->willReturn(4711);
         $this->siteRepositoryMock->expects(self::once())->method('getSiteByPageId')->with(888)->willReturn($fakeSite);
 
-        $this->processor->expects(self::once())->method('getTSFE')->willReturn($fakeTSFE);
         $this->processor->expects(self::once())->method('getUserIp')->willReturn($fakeIP);
         $this->processor->expects(self::once())->method('getTime')->willReturn($fakeTime);
         $this->typoScriptConfigurationMock->expects(self::once())->method('getStatisticsAnonymizeIP')->willReturn(0);

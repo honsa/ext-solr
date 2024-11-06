@@ -17,18 +17,14 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\ViewHelpers\Uri\Facet;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Uri\SearchUriBuilder;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Uri\Facet\AddFacetItemViewHelper;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Extbase\Mvc\Web\RequestBuilder;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class AddFacetItemViewHelperTest extends SetUpFacetItemViewHelper
 {
-    /**
-     * @test
-     */
-    public function addFacetItemWillUseUriBuilderAsExpected()
+    #[Test]
+    public function addFacetItemWillUseUriBuilderAsExpected(): void
     {
         $facet = $this->getTestColorFacet();
 

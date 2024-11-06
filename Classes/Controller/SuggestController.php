@@ -25,10 +25,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class SuggestController
- *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
- * @copyright (c) 2017 Timo Hund <timo.hund@dkd.de>
  */
 class SuggestController extends AbstractBaseController
 {
@@ -41,7 +37,7 @@ class SuggestController extends AbstractBaseController
      *
      * @noinspection PhpUnused
      */
-    public function suggestAction(string $queryString, ?string $callback = null, ?array $additionalFilters = []): ResponseInterface
+    public function suggestAction(string $queryString, ?array $additionalFilters = []): ResponseInterface
     {
         // Get suggestions
         $rawQuery = htmlspecialchars(mb_strtolower(trim($queryString)));
@@ -54,23 +50,19 @@ class SuggestController extends AbstractBaseController
             /** @var SuggestService $suggestService */
             $suggestService = GeneralUtility::makeInstance(
                 SuggestService::class,
-                $this->typoScriptFrontendController,
                 $this->searchService,
                 $this->typoScriptConfiguration
             );
 
             $additionalFilters = is_array($additionalFilters) ? array_map('htmlspecialchars', $additionalFilters) : [];
-            $pageId = $this->typoScriptFrontendController->getRequestedId();
-            $languageId = $this->typoScriptFrontendController->getLanguage()->getLanguageId();
+            $pageId = $this->request->getAttribute('routing')->getPageId();
+            $languageId = $this->request->getAttribute('language')?->getLanguageId();
             $arguments = $this->request->getArguments();
 
             $searchRequest = $this->getSearchRequestBuilder()->buildForSuggest($arguments, $rawQuery, $pageId, $languageId);
-            $result = $suggestService->getSuggestions($searchRequest, $additionalFilters);
+            $result = $suggestService->getSuggestions($this->request, $searchRequest, $additionalFilters);
         } catch (SolrUnavailableException) {
             return $this->handleSolrUnavailable();
-        }
-        if ($callback) {
-            return $this->htmlResponse(htmlspecialchars($callback) . '(' . json_encode($result, JSON_UNESCAPED_SLASHES) . ')');
         }
         return $this->htmlResponse(json_encode($result, JSON_UNESCAPED_SLASHES));
     }

@@ -20,20 +20,12 @@ namespace ApacheSolrForTypo3\Solr\ViewHelpers\Document;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResult;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\ViewHelpers\AbstractSolrFrontendViewHelper;
-use Closure;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 /**
  * Class RelevanceViewHelper
- *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class RelevanceViewHelper extends AbstractSolrFrontendViewHelper
 {
-    use CompileWithRenderStatic;
-
     /**
      * @inheritDoc
      */
@@ -51,18 +43,15 @@ class RelevanceViewHelper extends AbstractSolrFrontendViewHelper
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection PhpUnused
      */
-    public static function renderStatic(
-        array $arguments,
-        Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext,
-    ) {
+    public function render()
+    {
         /** @var SearchResult $document */
-        $document = $arguments['document'];
+        $document = $this->arguments['document'];
 
         /** @var SearchResultSet $resultSet */
-        $resultSet = $arguments['resultSet'];
+        $resultSet = $this->arguments['resultSet'];
 
-        $maximumScore = $arguments['maximumScore'] ?? $resultSet->getMaximumScore();
+        $maximumScore = $this->arguments['maximumScore'] ?? $resultSet->getMaximumScore();
         $content = 0;
 
         if ($maximumScore <= 0) {

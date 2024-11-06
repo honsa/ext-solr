@@ -17,19 +17,16 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Validator;
 
 use ApacheSolrForTypo3\Solr\System\Validator\Path;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for the Path helper class.
- *
- * @author Thomas Hohn <tho@systime.dk>
  */
 class PathTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canIsValidSolrPathisValidPath()
+    #[Test]
+    public function canIsValidSolrPathisValidPath(): void
     {
         $path = GeneralUtility::makeInstance(Path::class);
         $isValidPath = $path->isValidSolrPath('/sorl/core_da');
@@ -37,10 +34,8 @@ class PathTest extends SetUpUnitTestCase
         self::assertTrue($isValidPath);
     }
 
-    /**
-     * @test
-     */
-    public function canIsValidSolrPathEmptyString()
+    #[Test]
+    public function canIsValidSolrPathEmptyString(): void
     {
         $path = GeneralUtility::makeInstance(Path::class);
         $isValidPath = $path->isValidSolrPath('');
@@ -48,10 +43,8 @@ class PathTest extends SetUpUnitTestCase
         self::assertFalse($isValidPath);
     }
 
-    /**
-     * @test
-     */
-    public function canIsValidSolrPathisInvalidPathButAppears()
+    #[Test]
+    public function canIsValidSolrPathisInvalidPathButAppears(): void
     {
         $path = GeneralUtility::makeInstance(Path::class);
         $isValidPath = $path->isValidSolrPath('/sorl/#/core_da');
@@ -59,10 +52,8 @@ class PathTest extends SetUpUnitTestCase
         self::assertFalse($isValidPath);
     }
 
-    /**
-     * @test
-     */
-    public function canIsValidSolrPathisInvalidPath()
+    #[Test]
+    public function canIsValidSolrPathisInvalidPath(): void
     {
         $path = GeneralUtility::makeInstance(Path::class);
         $isValidPath = $path->isValidSolrPath('/sorl/core_da?bogus');

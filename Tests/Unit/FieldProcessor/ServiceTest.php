@@ -18,25 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\FieldProcessor;
 use ApacheSolrForTypo3\Solr\FieldProcessor\Service;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * tests the processing Service class
- *
- * @author Daniel Poetzinger <poetzinger@aoemedia.de>
  */
 class ServiceTest extends SetUpUnitTestCase
 {
-    /**
-     * @var Document
-     */
-    protected $documentMock;
-
-    /**
-     * the service
-     *
-     * @var Service
-     */
-    protected $service;
+    protected Document $documentMock;
+    protected Service $service;
 
     protected function setUp(): void
     {
@@ -45,10 +35,8 @@ class ServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function transformsStringToUppercaseOnSingleValuedField()
+    #[Test]
+    public function transformsStringToUppercaseOnSingleValuedField(): void
     {
         $this->documentMock->setField('stringField', 'stringvalue');
         $configuration = ['stringField' => 'uppercase'];
@@ -61,10 +49,8 @@ class ServiceTest extends SetUpUnitTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function transformsStringToUppercaseOnMultiValuedField()
+    #[Test]
+    public function transformsStringToUppercaseOnMultiValuedField(): void
     {
         $this->documentMock->addField('stringField', 'stringvalue_1');
         $this->documentMock->addField('stringField', 'stringvalue_2');
@@ -78,10 +64,8 @@ class ServiceTest extends SetUpUnitTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function transformsUnixTimestampToIsoDateOnSingleValuedField()
+    #[Test]
+    public function transformsUnixTimestampToIsoDateOnSingleValuedField(): void
     {
         $this->documentMock->setField(
             'dateField',
@@ -97,10 +81,8 @@ class ServiceTest extends SetUpUnitTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function transformsUnixTimestampToIsoDateOnMultiValuedField()
+    #[Test]
+    public function transformsUnixTimestampToIsoDateOnMultiValuedField(): void
     {
         $this->documentMock->addField(
             'dateField',
@@ -120,10 +102,8 @@ class ServiceTest extends SetUpUnitTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function customFieldProcessorTurnsFooIntoBar()
+    #[Test]
+    public function customFieldProcessorTurnsFooIntoBar(): void
     {
         $this->documentMock->setField('stringField', 'foo');
         $configuration = ['stringField' => 'turnFooIntoBar'];

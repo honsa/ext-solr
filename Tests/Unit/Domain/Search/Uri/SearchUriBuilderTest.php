@@ -22,6 +22,7 @@ use ApacheSolrForTypo3\Solr\Domain\Search\Uri\SearchUriBuilder;
 use ApacheSolrForTypo3\Solr\Routing\RoutingService;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Yaml\Yaml;
@@ -30,8 +31,6 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 /**
  * Unit test case for the ObjectReconstitutionProcessor.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SearchUriBuilderTest extends SetUpUnitTestCase
 {
@@ -53,9 +52,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function addFacetLinkIsCalledWithSubstitutedArguments(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
@@ -71,9 +68,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         $this->searchUrlBuilder->getAddFacetValueUri($previousRequest, 'foo', 'bar');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function addFacetLinkWillAddAdditionalConfiguredArguments(): void
     {
         $expectedArguments = ['tx_solr' => ['filter' => ['###tx_solr:filter:0:option###']], 'foo' => '###foo###'];
@@ -124,9 +119,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         self::assertEquals('/index.php?id=1&filter=option%3Avalue&foo=bar', $linkBuilderResult);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function setArgumentsIsOnlyCalledOnceEvenWhenMultipleFacetsGetRendered(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
@@ -150,9 +143,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         $this->searchUrlBuilder->getAddFacetValueUri($previousRequest, 'color', 'red');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function targetPageUidIsPassedWhenSortingIsAdded(): void
     {
         $expectedArguments = ['tx_solr' => ['sort' => '###tx_solr:sort###']];
@@ -189,9 +180,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         self::assertEquals('/index.php?id=1&' . urlencode('tx_solr[sort]') . '=' . urlencode('title desc'), $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetRemoveFacetOptionUri(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
@@ -218,9 +207,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         $this->searchUrlBuilder->getRemoveFacetValueUri($previousRequest, 'type', 'pages');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetRemoveFacetUri(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
@@ -251,9 +238,8 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
 
     /**
      * When a page for a group was set, this should be resetted when a facet is selected.
-     *
-     * @test
      */
+    #[Test]
     public function addFacetUriRemovesPreviousGroupPage(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
@@ -290,9 +276,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         self::assertSame('/index.php?id=1&tx_solr[filter][0]=type:pages', urldecode($uri), 'Unexpected uri generated');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetGroupPageForQueryGroup(): void
     {
         $expectedArguments = [
@@ -357,10 +341,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
     /*
      * Unit tests for router behaviour
      */
-
-    /**
-     * @test
-     */
+    #[Test]
     public function siteConfigurationModifyUriTest(): void
     {
         $configuration = Yaml::parse(self::getFixtureContentByName('siteConfiguration.yaml'));
@@ -413,9 +394,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         self::assertEquals($linkBuilderResult, $uri);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function siteConfigurationModifyUriKeepUnmappedFilterTest(): void
     {
         $configuration = Yaml::parse(self::getFixtureContentByName('siteConfiguration.yaml'));
@@ -471,9 +450,7 @@ class SearchUriBuilderTest extends SetUpUnitTestCase
         self::assertEquals($linkBuilderResult, $uri);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function uriErrorsResultInNonMappedProcessing(): void
     {
         $configuration = Yaml::parse(self::getFixtureContentByName('siteConfiguration.yaml'));

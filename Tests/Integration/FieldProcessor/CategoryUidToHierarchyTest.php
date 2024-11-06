@@ -17,19 +17,16 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\FieldProcessor;
 
 use ApacheSolrForTypo3\Solr\FieldProcessor\CategoryUidToHierarchy;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Integration test for the CategoryUidToHierarchy
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class CategoryUidToHierarchyTest extends IntegrationTestBase
 {
-    /**
-     * @test
-     */
-    public function canConvertToCategoryIdToHierarchy()
+    #[Test]
+    public function canConvertToCategoryIdToHierarchy(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/sys_category.csv');
         $processor = GeneralUtility::makeInstance(CategoryUidToHierarchy::class);

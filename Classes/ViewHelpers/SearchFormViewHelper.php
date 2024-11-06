@@ -18,10 +18,11 @@ declare(strict_types=1);
 namespace ApacheSolrForTypo3\Solr\ViewHelpers;
 
 use ApacheSolrForTypo3\Solr\System\Url\UrlHelper;
-use ApacheSolrForTypo3\Solr\System\Util\SiteUtility;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3Fluid\Fluid\Core\Variables\VariableProviderInterface;
@@ -29,8 +30,6 @@ use TYPO3Fluid\Fluid\Core\Variables\VariableProviderInterface;
 /**
  * Class SearchFormViewHelper
  *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
  *
  * @property RenderingContext $renderingContext
  */
@@ -87,11 +86,14 @@ class SearchFormViewHelper extends AbstractSolrFrontendTagBasedViewHelper
      */
     public function render()
     {
-        /** @phpstan-ignore-next-line */
-        $this->uriBuilder->setRequest($this->renderingContext->getRequest());
+        /** @var RequestInterface $request */
+        $request = $this->renderingContext->getAttribute(ServerRequestInterface::class);
+        $this->uriBuilder->setRequest($request);
         $pageUid = $this->arguments['pageUid'] ?? null;
         if ($pageUid === null && !empty($this->getTypoScriptConfiguration()->getSearchTargetPage())) {
             $pageUid = $this->getTypoScriptConfiguration()->getSearchTargetPage();
+        } elseif ($pageUid === null) {
+            $pageUid = $this->renderingContext->getAttribute(ServerRequestInterface::class)->getAttribute('routing')?->getPageId();
         }
         $pageUid = (int)$pageUid;
 
@@ -108,25 +110,11 @@ class SearchFormViewHelper extends AbstractSolrFrontendTagBasedViewHelper
         // @extensionScannerIgnoreLine
         $this->getTemplateVariableContainer()->add('q', $this->getQueryString());
         // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->add('pageUid', $pageUid);
-        // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->add(
-            'languageUid',
-            ($this->renderingContext->getRequest()->getAttribute('language')?->getLanguageId() ?? 0)
-        );
-        // @extensionScannerIgnoreLine
         $this->getTemplateVariableContainer()->add('existingParameters', $this->getExistingSearchParameters());
         // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->add('addPageAndLanguageId', !$this->getIsSiteManagedSite($pageUid));
         $formContent = $this->renderChildren();
         // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->remove('addPageAndLanguageId');
-        // @extensionScannerIgnoreLine
         $this->getTemplateVariableContainer()->remove('q');
-        // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->remove('pageUid');
-        // @extensionScannerIgnoreLine
-        $this->getTemplateVariableContainer()->remove('languageUid');
         // @extensionScannerIgnoreLine
         $this->getTemplateVariableContainer()->remove('existingParameters');
 
@@ -143,10 +131,10 @@ class SearchFormViewHelper extends AbstractSolrFrontendTagBasedViewHelper
     {
         $searchParameters = [];
         if ($this->getTypoScriptConfiguration()->getSearchKeepExistingParametersForNewSearches()) {
-            $request = $this->renderingContext->getRequest();
+            $request = $this->renderingContext->getAttribute(ServerRequestInterface::class);
             $pluginNamespace = $this->getTypoScriptConfiguration()->getSearchPluginNamespace();
-            $arguments = $request->getQueryParams()[$pluginNamespace];
-            ArrayUtility::mergeRecursiveWithOverrule($arguments, $request->getParsedBody()[$pluginNamespace]);
+            $arguments = $request->getQueryParams()[$pluginNamespace] ?? [];
+            ArrayUtility::mergeRecursiveWithOverrule($arguments, $request->getParsedBody()[$pluginNamespace] ?? []);
 
             unset($arguments['q'], $arguments['id'], $arguments['L']);
             $searchParameters = $this->translateSearchParametersToInputTagAttributes($arguments);
@@ -174,16 +162,6 @@ class SearchFormViewHelper extends AbstractSolrFrontendTagBasedViewHelper
             }
         }
         return $attributes;
-    }
-
-    /**
-     * When a site is managed with site management the language and the id are encoded in the path segment of the url.
-     * When no speaking urls are active (e.g. with TYPO3 8 and no realurl) this information is passed as query parameter
-     * and would get lost when it is only part of the query arguments in the action parameter of the form.
-     */
-    protected function getIsSiteManagedSite(int $pageId): bool
-    {
-        return SiteUtility::getIsSiteManagedSite($pageId);
     }
 
     protected function getTemplateVariableContainer(): ?VariableProviderInterface

@@ -46,10 +46,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * This was only introduced to be backwards compatible in long term only "getValueByPath", "isValidPath" or
  * speaking methods for configuration settings should be used!
- *
- * @author Marc Bastian Heinrichs <mbh@mbh-software.de>
- * @author Timo Schmidt <timo.schmidt@dkd.de>
- * @copyright (c) 2016 Timo Schmidt <timo.schmidt@dkd.de>
  */
 class TypoScriptConfiguration
 {
@@ -359,18 +355,6 @@ class TypoScriptConfiguration
         $path = 'plugin.tx_solr.index.queue.' . $configurationName . '.type';
         $type = $this->getValueByPath($path);
         if (!is_null($type)) {
-            return (string)$type;
-        }
-
-        // TODO: Remove fallback to "table" in v13
-        $path = 'plugin.tx_solr.index.queue.' . $configurationName . '.table';
-        $type = $this->getValueByPath($path);
-        if (!is_null($type)) {
-            trigger_error(
-                'queue.[indexConfig].table is deprecated and will be removed in v13. Use plugin.tx_solr.index.queue.[indexConfig].type instead.',
-                E_USER_DEPRECATED
-            );
-
             return (string)$type;
         }
 
@@ -981,7 +965,7 @@ class TypoScriptConfiguration
      *
      * plugin.tx_solr.search.lastSearches.mode
      */
-    public function getSearchLastSearchesMode(string $defaultIfEmpty = 'user'): string
+    public function getSearchLastSearchesMode(string $defaultIfEmpty = 'disabled'): string
     {
         $result = $this->getValueByPathOrDefaultValue('plugin.tx_solr.search.lastSearches.mode', $defaultIfEmpty);
         return (string)$result;

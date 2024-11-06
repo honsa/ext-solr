@@ -18,16 +18,11 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search;
 use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequest;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Schmidt <timo.schmidt@dkd.de>
- */
 class SearchRequestTest extends SetUpUnitTestCase
 {
-    /**
-     * @var SearchRequest
-     */
-    protected $searchRequest;
+    protected SearchRequest $searchRequest;
 
     protected function setUp(): void
     {
@@ -35,18 +30,14 @@ class SearchRequestTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function testGetPageIsNullWhenNothingWasPassed()
+    #[Test]
+    public function testGetPageIsNullWhenNothingWasPassed(): void
     {
         self::assertNull($this->searchRequest->getPage(), 'Page was expected to be null');
     }
 
-    /**
-     * @test
-     */
-    public function testCanMerge()
+    #[Test]
+    public function testCanMerge(): void
     {
         $this->searchRequest = new SearchRequest(['tx_solr' => ['page' => 2]]);
         self::assertSame(2, $this->searchRequest->getPage(), 'Retrieved unexpected page');
@@ -55,40 +46,32 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame(8, $this->searchRequest->getPage(), 'Page was not properly merged');
     }
 
-    /**
-     * @test
-     */
-    public function canGetActiveFilterNames()
+    #[Test]
+    public function canGetActiveFilterNames(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages';
         $request = $this->getSearchRequestFromQueryString($query);
         self::assertEquals(['type'], $request->getActiveFacetNames());
     }
 
-    /**
-     * @test
-     */
-    public function canGetRawQueryString()
+    #[Test]
+    public function canGetRawQueryString(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages';
         $request = $this->getSearchRequestFromQueryString($query);
         self::assertEquals('typo3', $request->getRawUserQuery());
     }
 
-    /**
-     * @test
-     */
-    public function canSetQueryString()
+    #[Test]
+    public function canSetQueryString(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         $data  = $request->setRawQueryString('foobar')->getAsArray();
         self::assertEquals(['tx_solr' => ['q' => 'foobar']], $data, 'The argument container did not contain the expected argument');
     }
 
-    /**
-     * @test
-     */
-    public function canAddOneFacet()
+    #[Test]
+    public function canAddOneFacet(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         $arguments  = $request->addFacetValue('foo', 'bar')->getAsArray();
@@ -97,10 +80,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments, 'Adding a facet did not product the expected structure');
     }
 
-    /**
-     * @test
-     */
-    public function canAddManyFacets()
+    #[Test]
+    public function canAddManyFacets(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         $arguments  = $request->addFacetValue('type', 'pages')->addFacetValue('type', 'tt_content')->getAsArray();
@@ -111,10 +92,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments, 'Adding a facet did not product the expected structure');
     }
 
-    /**
-     * @test
-     */
-    public function canAddFacetsAndQuery()
+    #[Test]
+    public function canAddFacetsAndQuery(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         $arguments  = $request->setRawQueryString('mysearch')->addFacetValue('type', 'tt_content')->getAsArray();
@@ -126,10 +105,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments, 'Could not set a query and add a facet at the same time');
     }
 
-    /**
-     * @test
-     */
-    public function canReset()
+    #[Test]
+    public function canReset(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         $arguments  = $request->setRawQueryString('mysearch')->addFacetValue('type', 'tt_content')->reset()->getAsArray();
@@ -137,10 +114,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments, 'Could not reset arguments');
     }
 
-    /**
-     * @test
-     */
-    public function canGetCopyForSubRequest()
+    #[Test]
+    public function canGetCopyForSubRequest(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
 
@@ -157,10 +132,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments, 'Could not reset arguments');
     }
 
-    /**
-     * @test
-     */
-    public function nonPersistentArgumentsGetLostForSubRequest()
+    #[Test]
+    public function nonPersistentArgumentsGetLostForSubRequest(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
 
@@ -177,28 +150,22 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame($arguments, $expectedArguments);
     }
 
-    /**
-     * @test
-     */
-    public function canGetContextSystemLanguageUidPassedOnCreation()
+    #[Test]
+    public function canGetContextSystemLanguageUidPassedOnCreation(): void
     {
         $request = new SearchRequest([], 111, 4711);
         self::assertSame($request->getContextSystemLanguageUid(), 4711, 'Can get initial passed sys_language_uid');
     }
 
-    /**
-     * @test
-     */
-    public function canGetContextPageUidPassedOnCreation()
+    #[Test]
+    public function canGetContextPageUidPassedOnCreation(): void
     {
         $request = new SearchRequest([], 111, 4711);
         self::assertSame($request->getContextPageUid(), 111, 'Can get initial passed page_uid');
     }
 
-    /**
-     * @test
-     */
-    public function canRemoveFacetValue()
+    #[Test]
+    public function canRemoveFacetValue(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -208,20 +175,16 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertFalse($request->getHasFacetValue('type', 'pages'), 'Could not remove facet value');
     }
 
-    /**
-     * @test
-     */
-    public function canGetFacetValues()
+    #[Test]
+    public function canGetFacetValues(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages&tx_solr%5Bfilter%5D%5B1%5D=type%253Anews';
         $request = $this->getSearchRequestFromQueryString($query);
         self::assertEquals(['pages', 'news'], $request->getActiveFacetValuesByName('type'));
     }
 
-    /**
-     * @test
-     */
-    public function canRemoveAllFacets()
+    #[Test]
+    public function canRemoveAllFacets(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages&tx_solr%5Bfilter%5D%5B1%5D=type%253Aevents';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -230,10 +193,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame(0, $request->getActiveFacetCount(), 'Expected to have no active facets');
     }
 
-    /**
-     * @test
-     */
-    public function canRemoveFacetsByName()
+    #[Test]
+    public function canRemoveFacetsByName(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bfilter%5D%5B0%5D=type%253Apages&tx_solr%5Bfilter%5D%5B1%5D=type%253Aevents&tx_solr%5Bfilter%5D%5B2%5D=created%253A1-4';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -242,10 +203,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame(1, $request->getActiveFacetCount(), 'Only 1 facet should remain active');
     }
 
-    /**
-     * @test
-     */
-    public function canGetSortingField()
+    #[Test]
+    public function canGetSortingField(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bsort%5D=title asc';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -254,10 +213,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame('asc', $request->getSortingDirection(), 'Expected sorting direction was asc');
     }
 
-    /**
-     * @test
-     */
-    public function canRemoveSorting()
+    #[Test]
+    public function canRemoveSorting(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3&tx_solr%5Bsort%5D=title asc';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -273,10 +230,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertFalse(isset($requestAsArray['tx_solr']['sort']), 'Sorting was set but was not expected to be set');
     }
 
-    /**
-     * @test
-     */
-    public function canSetSorting()
+    #[Test]
+    public function canSetSorting(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -286,28 +241,22 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertTrue($request->getHasSorting(), 'Passed query has no sorting');
     }
 
-    /**
-     * @test
-     */
-    public function canGetHighestGroupItemPageWhenNoPageWasPassed()
+    #[Test]
+    public function canGetHighestGroupItemPageWhenNoPageWasPassed(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         self::assertSame(1, $request->getHighestGroupPage(), 'Can not get highest group item page when no group page was passed');
     }
 
-    /**
-     * @test
-     */
-    public function canGetInitialGroupItemPage()
+    #[Test]
+    public function canGetInitialGroupItemPage(): void
     {
         $request = $this->getSearchRequestFromQueryString('');
         self::assertSame(1, $request->getGroupItemPage('typeGroup', 'pages'), 'Can not get initial group item page');
     }
 
-    /**
-     * @test
-     */
-    public function canSetGroupItemPage()
+    #[Test]
+    public function canSetGroupItemPage(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -316,10 +265,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame(2, $request->getGroupItemPage('typeGroup', 'pages'), 'Can not set and get groupItemPage');
     }
 
-    /**
-     * @test
-     */
-    public function canSetGroupItemPageForQuery()
+    #[Test]
+    public function canSetGroupItemPageForQuery(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -328,10 +275,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertSame(3, $request->getGroupItemPage('pidGroup', 'pid:[0 to 5]'), 'Can not set and get groupItemPage for a query');
     }
 
-    /**
-     * @test
-     */
-    public function canResetAllGroupItemPages()
+    #[Test]
+    public function canResetAllGroupItemPages(): void
     {
         $query = 'tx_solr%5Bq%5D=typo3';
         $request = $this->getSearchRequestFromQueryString($query);
@@ -346,19 +291,15 @@ class SearchRequestTest extends SetUpUnitTestCase
         self::assertArrayNotHasKey('groupPage', $requestArguments['tx_solr'], 'Expected to have two group pages registered');
     }
 
-    /**
-     * @test
-     */
-    public function twoDifferentRequestsHaveADifferentId()
+    #[Test]
+    public function twoDifferentRequestsHaveADifferentId(): void
     {
         $newSearchRequest = new SearchRequest();
         self::assertNotEquals($newSearchRequest->getId(), $this->searchRequest->getId(), 'Two different requests seem to have the same id');
     }
 
-    /**
-     * @test
-     */
-    public function setPerPageWillMarkedTheRequestAsChanged()
+    #[Test]
+    public function setPerPageWillMarkedTheRequestAsChanged(): void
     {
         self::assertFalse($this->searchRequest->getStateChanged());
         $this->searchRequest->setResultsPerPage(10);
@@ -377,10 +318,8 @@ class SearchRequestTest extends SetUpUnitTestCase
         return $request;
     }
 
-    /**
-     * @test
-     */
-    public function canGetContextTypoScriptConfigurationPassedOnCreation()
+    #[Test]
+    public function canGetContextTypoScriptConfigurationPassedOnCreation(): void
     {
         $typoScriptConfiguration = $this->createMock(TypoScriptConfiguration::class);
         $request = new SearchRequest([], 111, 4711, $typoScriptConfiguration);

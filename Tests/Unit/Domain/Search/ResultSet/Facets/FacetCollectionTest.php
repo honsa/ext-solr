@@ -19,18 +19,15 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\FacetCollection;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\OptionsFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class FacetCollectionTest
- *
- * @author Frans Saris <frans@beech.it>
  */
 class FacetCollectionTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canAddAndRetrieveFacetByKey()
+    #[Test]
+    public function canAddAndRetrieveFacetByKey(): void
     {
         $facetCollection = new FacetCollection();
         $resultSetMock = $this->createMock(SearchResultSet::class);
@@ -44,10 +41,8 @@ class FacetCollectionTest extends SetUpUnitTestCase
         self::assertEquals($brandFacet, $facetCollection['brand']);
     }
 
-    /**
-     * @test
-     */
-    public function canAddAndRetrieveFacetByPosition()
+    #[Test]
+    public function canAddAndRetrieveFacetByPosition(): void
     {
         $facetCollection = new FacetCollection();
         $resultSetMock = $this->createMock(SearchResultSet::class);
@@ -61,10 +56,8 @@ class FacetCollectionTest extends SetUpUnitTestCase
         self::assertEquals($brandFacet, $facetCollection->getByPosition(1));
     }
 
-    /**
-     * @test
-     */
-    public function canRetrieveFacetOfCollectionCopyByKey()
+    #[Test]
+    public function canRetrieveFacetOfCollectionCopyByKey(): void
     {
         $facetCollection = new FacetCollection();
         $resultSetMock = $this->createMock(SearchResultSet::class);
@@ -79,10 +72,8 @@ class FacetCollectionTest extends SetUpUnitTestCase
         self::assertEquals($brandFacet, $leftFacetCollection['brand']);
     }
 
-    /**
-     * @test
-     */
-    public function canRetrieveFacetOfCollectionCopyByPosition()
+    #[Test]
+    public function canRetrieveFacetOfCollectionCopyByPosition(): void
     {
         $facetCollection = new FacetCollection();
         $resultSetMock = $this->createMock(SearchResultSet::class);

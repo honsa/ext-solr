@@ -20,11 +20,9 @@ use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequestBuilder;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Session\FrontendUserSession;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class SearchRequestBuilderTest extends SetUpUnitTestCase
 {
     protected FrontendUserSession|MockObject $sessionMock;
@@ -39,9 +37,7 @@ class SearchRequestBuilderTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testPageIsResettedWhenValidResultsPerPageValueWasPassed(): void
     {
         $this->configurationMock->expects(self::once())->method('getSearchResultsPerPageSwitchOptionsAsArray')
@@ -59,9 +55,7 @@ class SearchRequestBuilderTest extends SetUpUnitTestCase
         self::assertSame($request->getPage(), null, 'Page was not resetted.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testPerPageValueIsNotSetInSession(): void
     {
         $this->configurationMock->expects(self::once())->method('getSearchResultsPerPageSwitchOptionsAsArray')

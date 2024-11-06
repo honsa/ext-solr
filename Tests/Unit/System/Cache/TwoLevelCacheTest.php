@@ -17,6 +17,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Cache;
 
 use ApacheSolrForTypo3\Solr\System\Cache\TwoLevelCache;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Cache\Backend\BackendInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
@@ -25,8 +26,6 @@ use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 
 /**
  * Unit testcase to check if the two level cache is working as expected.
- *
- * @author Timo Schmidt <timo.schmidt@dkd.de>
  */
 class TwoLevelCacheTest extends SetUpUnitTestCase
 {
@@ -46,9 +45,7 @@ class TwoLevelCacheTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getOnSecondaryCacheIsNeverCalledWhenValueIsPresentInFirstLevelCache(): void
     {
         $this->secondLevelCacheMock->expects(self::never())->method('get');
@@ -63,9 +60,9 @@ class TwoLevelCacheTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
      * @throws NoSuchCacheException
      */
+    #[Test]
     public function canHandleInvalidCacheIdentifierOnSet(): void
     {
         $cacheBackendMock = $this->createMock(BackendInterface::class);
@@ -77,13 +74,16 @@ class TwoLevelCacheTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
      * @throws NoSuchCacheException
      */
+    #[Test]
     public function canHandleInvalidCacheIdentifierOnGet(): void
     {
         $cacheBackendMock = $this->createMock(BackendInterface::class);
-        $cacheBackendMock->expects(self::once())->method('get')->willReturn(self::returnValue(''));
+        $cacheBackendMock
+            ->expects(self::once())
+            ->method('get')
+            ->willReturn('');
         $variableFrontend = new VariableFrontend('TwoLevelCacheTest', $cacheBackendMock);
         $this->twoLevelCache = new TwoLevelCache('test', $variableFrontend);
 

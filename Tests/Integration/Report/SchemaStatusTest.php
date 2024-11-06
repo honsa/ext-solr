@@ -19,13 +19,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Report;
 
 use ApacheSolrForTypo3\Solr\Report\SchemaStatus;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Integration test for the schema status report
- *
- * @author Timo Hund
  */
 class SchemaStatusTest extends IntegrationTestBase
 {
@@ -35,9 +34,7 @@ class SchemaStatusTest extends IntegrationTestBase
         $this->writeDefaultSolrTestSiteConfiguration();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetAGreenSchemaStatusAgainstTestServer(): void
     {
         /** @var SchemaStatus $schemaStatus */

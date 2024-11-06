@@ -25,12 +25,11 @@ use ApacheSolrForTypo3\Solr\Search\RelevanceComponent;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use Solarium\QueryType\Select\RequestBuilder;
 
 /**
  * Testcase for RelevanceComponent
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class RelevanceComponentTest extends SetUpUnitTestCase
 {
@@ -45,9 +44,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         return $request->getParams();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetQuerySlop(): void
     {
         $searchConfiguration = [
@@ -83,9 +80,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame(2, $this->getQueryParameters($query)['qs'], 'querySlop was not applied as qs parameter');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function querySlopIsNotSetWhenPhraseIsDisabled(): void
     {
         $searchConfiguration = [
@@ -120,9 +115,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertArrayNotHasKey('qs', $this->getQueryParameters($query), 'querySlop should still be null because phrase is disabled');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetSlop(): void
     {
         $searchConfiguration = [
@@ -158,10 +151,8 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame(3, $this->getQueryParameters($query)['ps'], 'slop was not applied as qs parameter');
     }
 
-    /**
-     * @test
-     */
-    public function slopIsNullWhenPhraseIsDisabled()
+    #[Test]
+    public function slopIsNullWhenPhraseIsDisabled(): void
     {
         $searchConfiguration = [
             'query.' => [
@@ -195,9 +186,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertArrayNotHasKey('ps', $this->getQueryParameters($query), 'PhraseSlop should be null, when phrase is disabled');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetBigramPhraseSlop(): void
     {
         $searchConfiguration = [
@@ -233,9 +222,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame(4, $this->getQueryParameters($query)['ps2'], 'slop was not applied as qs parameter');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canNotSetBigramPhraseSlopWhenBigramPhraseIsDisabled(): void
     {
         $searchConfiguration = [
@@ -270,9 +257,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertArrayNotHasKey('ps2', $this->getQueryParameters($query), 'ps2 parameter should be empty because bigramPhrases are disabled');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetTrigramPhraseSlop(): void
     {
         $searchConfiguration = [
@@ -308,9 +293,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame(4, $this->getQueryParameters($query)['ps3'], 'slop was not applied as qs parameter');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canNotSetTrigramPhraseSlopWhenBigramPhraseIsDisabled(): void
     {
         $searchConfiguration = [
@@ -346,9 +329,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertArrayNotHasKey('ps3', $this->getQueryParameters($query), 'ps3 parameter should be empty because bigramPhrases are disabled');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetTieParameter(): void
     {
         $searchConfiguration = [
@@ -380,9 +361,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame((float)'0.78', $this->getQueryParameters($query)['tie'], 'tieParameter was not applied as tie parameter');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetBoostQuery(): void
     {
         $searchConfiguration = [
@@ -415,9 +394,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame('type:pages^100', $this->getQueryParameters($query)['bq'], 'Configured boostQuery was not applied');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetBoostQueries(): void
     {
         $searchConfiguration = [
@@ -454,9 +431,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame('type:tx_solr_file^400', $this->getQueryParameters($query)['bq'][1], 'Configured boostQuery was not applied');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetBoostFunction(): void
     {
         $searchConfiguration = [
@@ -489,9 +464,7 @@ class RelevanceComponentTest extends SetUpUnitTestCase
         self::assertSame('sum(clicks)^100', $this->getQueryParameters($query)['bf'], 'Configured boostFunction was not applied');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetMinimumMatch(): void
     {
         $searchConfiguration = [

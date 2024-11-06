@@ -36,8 +36,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  *
  * @todo: Support all index queues in actions beside "initializeIndexQueueAction" and
  *        "resetLogErrorsAction"
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class IndexQueueModuleController extends AbstractModuleController
 {
@@ -67,17 +65,16 @@ class IndexQueueModuleController extends AbstractModuleController
      */
     public function indexAction(): ResponseInterface
     {
-        $this->initializeAction();
         if (!$this->canQueueSelectedSite()) {
-            $this->view->assign('can_not_proceed', true);
-            return $this->getModuleTemplateResponse();
+            $this->moduleTemplate->assign('can_not_proceed', true);
+            return $this->moduleTemplate->renderResponse('Backend/Search/IndexQueueModule/Index');
         }
 
         $statistics = $this->indexQueue->getStatisticsBySite($this->selectedSite);
-        $this->view->assign('indexQueueInitializationSelector', $this->getIndexQueueInitializationSelector());
-        $this->view->assign('indexqueue_statistics', $statistics);
-        $this->view->assign('indexqueue_errors', $this->indexQueue->getErrorsBySite($this->selectedSite));
-        return $this->getModuleTemplateResponse();
+        $this->moduleTemplate->assign('indexQueueInitializationSelector', $this->getIndexQueueInitializationSelector());
+        $this->moduleTemplate->assign('indexqueue_statistics', $statistics);
+        $this->moduleTemplate->assign('indexqueue_errors', $this->indexQueue->getErrorsBySite($this->selectedSite));
+        return $this->moduleTemplate->renderResponse('Backend/Search/IndexQueueModule/Index');
     }
 
     /**
@@ -270,8 +267,8 @@ class IndexQueueModuleController extends AbstractModuleController
             return new RedirectResponse($this->uriBuilder->uriFor('index'), 303);
         }
 
-        $this->view->assign('indexQueueItem', $item);
-        return $this->getModuleTemplateResponse();
+        $this->moduleTemplate->assign('indexQueueItem', $item);
+        return $this->moduleTemplate->renderResponse('Backend/Search/IndexQueueModule/ShowError');
     }
 
     /**

@@ -22,6 +22,7 @@ use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Frontend\ContentObject\Exception\ContentRenderingException;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -39,7 +40,7 @@ final class AfterPageDocumentIsCreatedForIndexingEvent
         private readonly Item $indexQueueItem,
         private readonly array $record,
         private readonly TypoScriptFrontendController $tsfe,
-        private readonly TypoScriptConfiguration $configuration
+        private readonly TypoScriptConfiguration $configuration,
     ) {}
 
     public function getDocument(): Document
@@ -62,14 +63,20 @@ final class AfterPageDocumentIsCreatedForIndexingEvent
         return $this->indexQueueItem->getIndexingConfigurationName();
     }
 
+    /**
+     * @throws ContentRenderingException
+     */
     public function getSite(): Site
     {
-        return $this->tsfe->getSite();
+        return clone $this->tsfe->cObj->getRequest()->getAttribute('site');
     }
 
+    /**
+     * @throws ContentRenderingException
+     */
     public function getSiteLanguage(): SiteLanguage
     {
-        return $this->tsfe->getLanguage();
+        return $this->getSite()->getAttribute('language');
     }
 
     public function getRecord(): array

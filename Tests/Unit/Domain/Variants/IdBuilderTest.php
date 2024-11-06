@@ -22,35 +22,33 @@ use ApacheSolrForTypo3\Solr\Domain\Variants\IdBuilder;
 use ApacheSolrForTypo3\Solr\Event\Variants\AfterVariantIdWasBuiltEvent;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\EventDispatcher\NoopEventDispatcher;
-use TYPO3\CMS\Core\Tests\Unit\Fixtures\EventDispatcher\MockEventDispatcher;
 
 /**
  * Testcase to check if the IdBuilder can be used to build proper variantIds.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class IdBuilderTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function canBuildVariantId(): void
     {
         $build = new IdBuilder(new NoopEventDispatcher());
         $variantId = $build->buildFromTypeAndUid('pages', 4711, [], $this->createMock(Site::class), new Document());
-        self::assertSame('c523304ea47711019595d2bb352b623d1db40427/pages/4711', $variantId);
+        self::assertSame('6b00c7b4c2763ee0fb96be298ae3b00d80fcd013/pages/4711', $variantId);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canUseCustomEventListener(): void
     {
-        $eventDispatcher = new MockEventDispatcher();
-        $eventDispatcher->addListener(function (AfterVariantIdWasBuiltEvent $event) {
-            $event->setVariantId('mycustomid');
-        });
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects(self::once())->method('dispatch')->willReturnCallback(
+            static function (AfterVariantIdWasBuiltEvent $event) {
+                $event->setVariantId('mycustomid');
+                return $event;
+            }
+        );
         $build = new IdBuilder($eventDispatcher);
         $variantId = $build->buildFromTypeAndUid('pages', 4711, [], $this->createMock(Site::class), new Document());
 

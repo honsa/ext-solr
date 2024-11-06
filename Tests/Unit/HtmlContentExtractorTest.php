@@ -16,18 +16,16 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Unit;
 
 use ApacheSolrForTypo3\Solr\HtmlContentExtractor;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 
 /**
  * Tests the HtmlContentExtractor
- *
- * Timo Hund <timo.hund@dkd.de>
  */
 class HtmlContentExtractorTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetTagContent(): void
     {
         $extractor = new HtmlContentExtractor(self::getFixtureContentByName('fixture2.html'));
@@ -45,34 +43,32 @@ class HtmlContentExtractorTest extends SetUpUnitTestCase
     {
         yield 'unifyWhitespaces' => [
             'websiteContent' => static::getFixtureContentByName('fixture2.html'),
-            'exptectedIndexableContent' => 'Title Level 1 headline Hello World Level 2 headline Level 3 headline',
+            'expectedIndexableContent' => 'Title Level 1 headline Hello World Level 2 headline Level 3 headline',
         ];
         yield 'unifyTabs' => [
             'websiteContent' => "Test\t\tTest",
-            'exptectedIndexableContent' => 'Test Test',
+            'expectedIndexableContent' => 'Test Test',
         ];
         yield 'removeScriptTags' => [
             'websiteContent' => '<script>foo</script>Test',
-            'exptectedIndexableContent' => 'Test',
+            'expectedIndexableContent' => 'Test',
         ];
         yield 'decodeEntities' => [
             'websiteContent' => 'B&auml;hm',
-            'exptectedIndexableContent' => 'Bähm',
+            'expectedIndexableContent' => 'Bähm',
         ];
         yield 'decodeSpaceEntities' => [
             'websiteContent' => 'B&auml;hm&nbsp; Bum',
-            'exptectedIndexableContent' => 'Bähm Bum',
+            'expectedIndexableContent' => 'Bähm Bum',
         ];
         yield 'decodeSpaceUtf8Nbsp' => [
             'websiteContent' => 'test <br/>afterNBSP',
-            'exptectedIndexableContent' => 'test afterNBSP',
+            'expectedIndexableContent' => 'test afterNBSP',
         ];
     }
 
-    /**
-     * @dataProvider getIndexableContentDataProvider
-     * @test
-     */
+    #[DataProvider('getIndexableContentDataProvider')]
+    #[Test]
     public function canUnifyWhitespacesInIndexableContent($websiteContent, $expectedIndexableContent): void
     {
         $extractor = new HtmlContentExtractor($websiteContent);

@@ -4,6 +4,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Backend;
 
 use ApacheSolrForTypo3\Solr\Backend\SettingsPreviewOnPlugins;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Backend\View\Event\PageContentPreviewRenderingEvent;
 use TYPO3\CMS\Backend\View\PageLayoutContext;
@@ -62,10 +63,8 @@ class SettingsPreviewOnPluginsTest extends IntegrationTestBase
         $GLOBALS['LANG'] = $GLOBALS['LANG'] = GeneralUtility::makeInstance(LanguageServiceFactory::class)->create('default');
     }
 
-    /**
-     * @test
-     */
-    public function printsPreviewOnExtSolrPluginsCorrectly()
+    #[Test]
+    public function printsPreviewOnExtSolrPluginsCorrectly(): void
     {
         $settingsPreviewOnPlugins = new SettingsPreviewOnPlugins(
             $this->getMockOfFlexFormService($this->flexFormArray)
@@ -75,7 +74,7 @@ class SettingsPreviewOnPluginsTest extends IntegrationTestBase
             [
                 'pid' => 11,
                 'pi_flexform' => 'provided via mock return value $this->flexFormArray',
-                'list_type' => 'solr_pi_results',
+                'CType' => 'solr_pi_results',
                 'hidden' => 0,
             ]
         );
@@ -96,6 +95,7 @@ class SettingsPreviewOnPluginsTest extends IntegrationTestBase
     {
         return new PageContentPreviewRenderingEvent(
             $table,
+            (string)($record[(string)($GLOBALS['TCA'][$table]['ctrl']['type'] ?? '')] ?? ''),
             $record,
             $this->createMock(PageLayoutContext::class)
         );

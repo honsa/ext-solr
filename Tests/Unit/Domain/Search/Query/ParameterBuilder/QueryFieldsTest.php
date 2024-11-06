@@ -17,16 +17,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\Query\ParameterBuilde
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Query\ParameterBuilder\QueryFields;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class QueryFieldsTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canBuildFromString()
+    #[Test]
+    public function canBuildFromString(): void
     {
         $input = 'one^10.0,two^20.0,three^5.0';
         $queryFields = QueryFields::fromString($input, ',');

@@ -179,7 +179,8 @@ defined('TYPO3') or die('Access denied.');
         ],
         [
             SearchController::class => 'results',
-        ]
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
     ExtensionUtility::configurePlugin(
@@ -187,7 +188,11 @@ defined('TYPO3') or die('Access denied.');
         'pi_search',
         [
             SearchController::class => 'form',
-        ]
+        ],
+        [
+
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
     ExtensionUtility::configurePlugin(
@@ -198,7 +203,8 @@ defined('TYPO3') or die('Access denied.');
         ],
         [
             SearchController::class => 'frequentlySearched',
-        ]
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
     ExtensionUtility::configurePlugin(
@@ -209,7 +215,8 @@ defined('TYPO3') or die('Access denied.');
         ],
         [
             SuggestController::class => 'suggest',
-        ]
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
     // register the Fluid namespace 'solr' globally
@@ -221,7 +228,7 @@ defined('TYPO3') or die('Access denied.');
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['enhancers']['SolrFacetMaskAndCombineEnhancer'] = SolrFacetMaskAndCombineEnhancer::class;
 
     // add solr field to rootline fields
-    if ($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] === '') {
+    if (($GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] ?? '') === '') {
         $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] = 'no_search_sub_entries';
     } else {
         $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ',no_search_sub_entries';

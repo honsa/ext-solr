@@ -19,14 +19,9 @@ namespace ApacheSolrForTypo3\Solr\ViewHelpers\Uri\Paginate;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\GroupItem;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Uri\AbstractUriViewHelper;
-use Closure;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
 /**
  * Class GroupItemPageViewHelper
- *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class GroupItemPageViewHelper extends AbstractUriViewHelper
 {
@@ -43,11 +38,11 @@ class GroupItemPageViewHelper extends AbstractUriViewHelper
     /**
      * @noinspection PhpMissingReturnTypeInspection
      */
-    public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public function render()
     {
-        $page = $arguments['page'];
-        $groupItem = $arguments['groupItem'];
-        $previousRequest = static::getUsedSearchRequestFromRenderingContext($renderingContext);
-        return self::getSearchUriBuilder($renderingContext)->getResultGroupItemPageUri($previousRequest, $groupItem, (int)$page);
+        $page = $this->arguments['page'];
+        $groupItem = $this->arguments['groupItem'];
+        $previousRequest = static::getUsedSearchRequestFromRenderingContext($this->renderingContext);
+        return self::getSearchUriBuilder($this->renderingContext)->getResultGroupItemPageUri($previousRequest, $groupItem, (int)$page);
     }
 }

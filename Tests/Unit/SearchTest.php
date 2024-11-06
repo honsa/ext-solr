@@ -22,32 +22,33 @@ use ApacheSolrForTypo3\Solr\Search;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrReadService;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use Solarium\Client;
+use Symfony\Component\DependencyInjection\Container;
+use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SearchTest extends SetUpUnitTestCase
 {
-    /**
-     * @var SolrConnection
-     */
     protected SolrConnection|MockObject $solrConnectionMock;
-
-    /**
-     * @var SolrReadService|MockObject
-     */
     protected SolrReadService|MockObject $solrReadServiceMock;
-
-    /**
-     * @var Search
-     */
     protected Search $search;
 
     protected function setUp(): void
     {
-        //        $this->solrReadServiceMock = $this->createMock(SolrReadService::class);
-        $this->solrReadServiceMock = $this->getMockBuilder(SolrReadService::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['search'])
-            ->getMock();
+        $container = new Container();
+        $container->set(SiteFinder::class, $this->createMock(SiteFinder::class));
+        GeneralUtility::setContainer($container);
+        $this->solrReadServiceMock = $this->getAccessibleMock(
+            SolrReadService::class,
+            [
+                'search',
+            ],
+            [
+                $this->createMock(Client::class),
+            ]
+        );
 
         $this->solrConnectionMock = $this->createMock(SolrConnection::class);
         $this->solrConnectionMock->expects(self::any())->method('getReadService')->willReturn($this->solrReadServiceMock);
@@ -55,10 +56,8 @@ class SearchTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canPassLimit()
+    #[Test]
+    public function canPassLimit(): void
     {
         $query = new SearchQuery();
         $limit = 99;
@@ -72,10 +71,8 @@ class SearchTest extends SetUpUnitTestCase
         $this->search->search($query, 0, $limit);
     }
 
-    /**
-     * @test
-     */
-    public function canKeepLimitWhenNullWasPassedAsLimit()
+    #[Test]
+    public function canKeepLimitWhenNullWasPassedAsLimit(): void
     {
         $query = new SearchQuery();
         $limit = 99;

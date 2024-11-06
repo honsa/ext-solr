@@ -17,16 +17,12 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\IndexQueue\FrontendHelper;
 
 use ApacheSolrForTypo3\Solr\IndexQueue\FrontendHelper\Manager;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class ManagerTest extends SetUpUnitTestCase
 {
-    /**
-     * @var Manager
-     */
-    protected $manager;
+    protected Manager $manager;
 
     protected function setUp(): void
     {
@@ -34,22 +30,18 @@ class ManagerTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function resolveActionReturnsNullWhenNoHandlerIsRegistered()
+    #[Test]
+    public function resolveActionReturnsNullWhenNoHandlerIsRegistered(): void
     {
         $handler = $this->manager->resolveAction('foo');
         self::assertNull($handler, 'Unregistered action should return null when it will be resolved');
     }
 
-    /**
-     * @test
-     */
-    public function exceptionIsThrownWhenInvalidActionHandlerIsRetrieved()
+    #[Test]
+    public function exceptionIsThrownWhenInvalidActionHandlerIsRetrieved(): void
     {
         Manager::registerFrontendHelper('test', InvalidFakeHelper::class);
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $message = InvalidFakeHelper::class . ' is not an implementation of ApacheSolrForTypo3\Solr\IndexQueue\FrontendHelper\FrontendHelper';
         $this->expectExceptionMessage($message);
         $handler = $this->manager->resolveAction('test');

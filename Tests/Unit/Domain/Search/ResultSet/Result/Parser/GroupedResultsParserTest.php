@@ -16,24 +16,33 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Result\Parser;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\Group;
+use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\Parser\DocumentEscapeService;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\Parser\GroupedResultParser;
+use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResultBuilder;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequest;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase to test the GroupedResultsParser.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class GroupedResultsParserTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canParsedQueryGroupResult()
+    protected GroupedResultParser $parser;
+
+    protected function setUp(): void
+    {
+        $this->parser = new GroupedResultParser(
+            $this->createMock(SearchResultBuilder::class),
+            $this->createMock(DocumentEscapeService::class),
+        );
+        parent::setUp();
+    }
+    #[Test]
+    public function canParsedQueryGroupResult(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
         $configurationMock->expects(self::any())->method('getSearchGroupingGroupsConfiguration')->willReturn([
@@ -49,8 +58,7 @@ class GroupedResultsParserTest extends SetUpUnitTestCase
 
         $resultSet = $this->getSearchResultSetMockFromConfigurationAndFixtureFileName($configurationMock, 'fake_solr_response_group_on_queries.json');
 
-        $parser = new GroupedResultParser();
-        $searchResultsSet = $parser->parse($resultSet);
+        $searchResultsSet = $this->parser->parse($resultSet);
         $searchResultsCollection = $searchResultsSet->getSearchResults();
 
         self::assertTrue($searchResultsCollection->getHasGroups());
@@ -61,10 +69,8 @@ class GroupedResultsParserTest extends SetUpUnitTestCase
         self::assertSame(3, $queryGroup->getCount(), 'Unexpected amount of groups in parsing result');
     }
 
-    /**
-     * @test
-     */
-    public function canParsedQueryFieldResult()
+    #[Test]
+    public function canParsedQueryFieldResult(): void
     {
         $configurationMock = $this->createMock(TypoScriptConfiguration::class);
         $configurationMock->expects(self::any())->method('getSearchGroupingGroupsConfiguration')->willReturn([
@@ -79,8 +85,7 @@ class GroupedResultsParserTest extends SetUpUnitTestCase
 
         $resultSet = $this->getSearchResultSetMockFromConfigurationAndFixtureFileName($configurationMock, 'fake_solr_response_group_on_fields.json');
 
-        $parser = new GroupedResultParser();
-        $searchResultsSet = $parser->parse($resultSet);
+        $searchResultsSet = $this->parser->parse($resultSet);
         $searchResultsCollection = $searchResultsSet->getSearchResults();
 
         self::assertTrue($searchResultsCollection->getHasGroups());

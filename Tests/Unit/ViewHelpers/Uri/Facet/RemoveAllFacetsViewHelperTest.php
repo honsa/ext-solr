@@ -19,20 +19,18 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequest;
 use ApacheSolrForTypo3\Solr\Domain\Search\Uri\SearchUriBuilder;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Uri\Facet\RemoveAllFacetsViewHelper;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Extbase\Mvc\Web\RequestBuilder;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3Fluid\Fluid\Core\Variables\StandardVariableProvider;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class RemoveAllFacetsViewHelperTest extends SetUpFacetItemViewHelper
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function setFacetItemWillUseUriBuilderAsExpected(): void
     {
         $mockedPreviousFakedRequest = $this->createMock(SearchRequest::class);
@@ -57,6 +55,8 @@ class RemoveAllFacetsViewHelperTest extends SetUpFacetItemViewHelper
 
         /** @var MockObject|SearchUriBuilder $searchUriBuilderMock */
         $searchUriBuilderMock = $this->createMock(SearchUriBuilder::class);
+
+        GeneralUtility::addInstance(UriBuilder::class, $this->createMock(UriBuilder::class));
 
         // we expected that the getRemoveAllFacetsUri will be called on the searchUriBuilder in the end.
         $searchUriBuilderMock->expects(self::once())->method('getRemoveAllFacetsUri')->with($mockedPreviousFakedRequest);

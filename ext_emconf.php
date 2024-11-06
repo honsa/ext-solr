@@ -3,16 +3,16 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Apache Solr for TYPO3 - Enterprise Search',
     'description' => 'Apache Solr for TYPO3 is the enterprise search server you were looking for with special features such as Faceted Search or Synonym Support and incredibly fast response times of results within milliseconds.',
-    'version' => '12.0.2',
-    'state' => 'stable',
+    'version' => '13.0.0-alpha-1',
+    'state' => 'alpha',
     'category' => 'plugin',
-    'author' => 'Ingo Renner, Timo Hund, Markus Friedrich',
-    'author_email' => 'ingo@typo3.org',
+    'author' => 'Rafael Kaehm, Markus Friedrich',
+    'author_email' => 'info@dkd.de',
     'author_company' => 'dkd Internet Service GmbH',
     'constraints' => [
         'depends' => [
             'scheduler' => '',
-            'typo3' => '12.4.3-12.4.99',
+            'typo3' => '13.1.0-13.4.99',
         ],
         'conflicts' => [],
         'suggests' => [],

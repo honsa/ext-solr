@@ -6,16 +6,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Access;
 
 use ApacheSolrForTypo3\Solr\Access\Rootline;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class RootlineTest
  */
 class RootlineTest extends IntegrationTestBase
 {
-    /**
-     * @test
-     */
-    public function canGetAccessRootlineByPageId()
+    #[Test]
+    public function canGetAccessRootlineByPageId(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/user_protected_page.csv');
         $accessRootline = Rootline::getAccessRootlineByPageId(10);

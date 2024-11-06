@@ -21,38 +21,23 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\RecordGarbag
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
 use ApacheSolrForTypo3\Solr\GarbageCollector;
 use ApacheSolrForTypo3\Solr\System\TCA\TCAService;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use ReflectionObject;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for the GarbageCollector class.
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 class GarbageCollectorTest extends SetUpUnitTestCase
 {
-    /**
-     * @var GarbageCollector
-     */
-    protected $garbageCollector;
-
-    /**
-     * @var TCAService|MockObject
-     */
-    protected $tcaServiceMock;
-
-    /**
-     * @var EventDispatcherInterface|MockObject
-     */
-    protected $eventDispatcherMock;
-
-    /**
-     * @var GarbageHandler|MockObject
-     */
-    protected $garbageHandlerMock;
+    protected GarbageCollector $garbageCollector;
+    protected TCAService|MockObject $tcaServiceMock;
+    protected EventDispatcherInterface|MockObject $eventDispatcherMock;
+    protected GarbageHandler|MockObject $garbageHandlerMock;
 
     protected function setUp(): void
     {
@@ -76,9 +61,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_preProcessUHandlesRecordDeletion(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -97,9 +80,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         self::assertEquals(123, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_preProcessIgnoresDraftWorkspace(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -111,9 +92,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         $this->garbageCollector->processCmdmap_preProcess('delete', 'pages', 123, '', $dataHandlerMock);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessHandlesPageMovement(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -133,9 +112,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         self::assertEquals(1011, $dispatchedEvent->getUid());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processCmdmap_postProcessIgnoresPageMovementInDraftWorkspace(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -148,9 +125,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         $this->garbageCollector->processCmdmap_postProcess('move', 'pages', 1011, '', $dataHandlerMock);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processDatamap_preProcessFieldArrayStoresRecordData(): void
     {
         $dataHandlerMock = $this->createMock(DataHandler::class);
@@ -190,7 +165,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
 
         $this->garbageCollector->processDatamap_preProcessFieldArray([], 'tx_foo_bar', 123, $dataHandlerMock);
 
-        $objectReflection = new \ReflectionObject($this->garbageCollector);
+        $objectReflection = new ReflectionObject($this->garbageCollector);
         $property = $objectReflection->getProperty('trackedRecords');
         $property->setAccessible(true);
         $trackedRecords = $property->getValue($this->garbageCollector);
@@ -198,9 +173,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         self::assertEquals($dummyRecord, $trackedRecords['tx_foo_bar'][123]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function processDatamap_afterDatabaseOperationsTriggersRecordGarbageCheck(): void
     {
         $GLOBALS['TCA']['tx_foo_bar']['ctrl']['enablecolumns']['fe_group'] = 'fe_group';
@@ -250,9 +223,7 @@ class GarbageCollectorTest extends SetUpUnitTestCase
         self::assertTrue($dispatchedEvent->frontendGroupsRemoved());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectGarbageTriggersGarbageCollection(): void
     {
         $this->garbageHandlerMock

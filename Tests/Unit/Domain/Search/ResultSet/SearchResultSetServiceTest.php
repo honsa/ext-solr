@@ -29,15 +29,12 @@ use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Solarium\Component\Grouping;
-use TYPO3\CMS\Core\Tests\Unit\Fixtures\EventDispatcher\MockEventDispatcher;
+use TYPO3\CMS\Core\EventDispatcher\NoopEventDispatcher;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class SearchResultSetServiceTest extends SetUpUnitTestCase
 {
     protected SearchResultSetService $searchResultSetService;
@@ -46,7 +43,7 @@ class SearchResultSetServiceTest extends SetUpUnitTestCase
     protected SolrLogManager|MockObject $logManagerMock;
     protected SearchResultBuilder|MockObject $searchResultBuilderMock;
     protected QueryBuilder|MockObject $queryBuilderMock;
-    protected EventDispatcherInterface $eventDispatcher;
+    protected NoopEventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -55,14 +52,12 @@ class SearchResultSetServiceTest extends SetUpUnitTestCase
         $this->searchMock = $this->createMock(Search::class);
         $this->searchResultBuilderMock = $this->createMock(SearchResultBuilder::class);
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $this->eventDispatcher = new MockEventDispatcher();
+        $this->eventDispatcher = new NoopEventDispatcher();
         $this->searchResultSetService = new SearchResultSetService($this->configurationMock, $this->searchMock, $this->logManagerMock, $this->searchResultBuilderMock, $this->queryBuilderMock, $this->eventDispatcher);
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function searchIsNotTriggeredWhenEmptySearchDisabledAndEmptyQueryWasPassed(): void
     {
         $searchRequest = new SearchRequest();
@@ -72,9 +67,7 @@ class SearchResultSetServiceTest extends SetUpUnitTestCase
         self::assertFalse($resultSet->getHasSearched(), 'Search should not be executed when empty query string was passed');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function searchIsNotTriggeredWhenEmptyQueryWasPassedAndEmptySearchWasDisabled(): void
     {
         $searchRequest = new SearchRequest();
@@ -84,9 +77,7 @@ class SearchResultSetServiceTest extends SetUpUnitTestCase
         self::assertFalse($resultSet->getHasSearched(), 'Search should not be executed when empty query string was passed');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCreateGroups(): void
     {
         // source: http://solr-ddev-site.ddev.site:8983/solr/core_en/select

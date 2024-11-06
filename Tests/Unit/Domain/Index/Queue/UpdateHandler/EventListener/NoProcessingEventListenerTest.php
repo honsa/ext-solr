@@ -15,25 +15,18 @@
 
 namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Index\Queue\UpdateHandler\EventListener;
 
-use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\AbstractBaseEventListener;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\NoProcessingEventListener;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\RecordUpdatedEvent;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the NoProcessingEventListener
  *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
+ * @property NoProcessingEventListener $listener;
  */
 class NoProcessingEventListenerTest extends SetUpEventListener
 {
-    /**
-     * @var NoProcessingEventListener
-     */
-    protected AbstractBaseEventListener $listener;
-
-    /**
-     * @test
-     */
+    #[Test]
     public function canHandleEvents(): void
     {
         $this->extensionConfigurationMock
@@ -46,9 +39,7 @@ class NoProcessingEventListenerTest extends SetUpEventListener
         self::assertTrue($event->isPropagationStopped());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSkipEventHandlingIfDisabled(): void
     {
         $this->extensionConfigurationMock

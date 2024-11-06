@@ -21,6 +21,8 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Server\RequestHandlerInterface;
 use Traversable;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -31,8 +33,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for the record indexer
- *
- * @author Timo Schmidt
  */
 class IndexerTest extends IntegrationTestBase
 {
@@ -70,12 +70,12 @@ class IndexerTest extends IntegrationTestBase
         $handlerMock = $this->createMock(RequestHandlerInterface::class);
         $normalizer = new NormalizedParamsAttribute();
         $normalizer->process($request, $handlerMock);
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->cleanUpSolrServerAndAssertEmpty();
         unset(
             $this->indexQueue,
             $this->indexer,
@@ -84,12 +84,10 @@ class IndexerTest extends IntegrationTestBase
 
     /**
      * This testcase should check if we can queue a custom record with MM relations.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithMMRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_mm_relation.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -103,25 +101,25 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"category_stringM":["the tag"]', $solrContent, 'Did not find MM related tag');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"testnews"', $solrContent, 'Could not index document into solr');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     public static function getTranslatedRecordDataProvider(): Traversable
     {
-        yield 'with_l_parameter' => ['can_index_custom_translated_record_with_l_param.csv'];
-        yield 'without_l_parameter' => ['can_index_custom_translated_record_without_l_param.csv'];
-        yield 'without_l_parameter_and_content_fallback' => ['can_index_custom_translated_record_without_l_param_and_content_fallback.csv'];
+        yield 'with_l_parameter' => [
+            'fixture' => 'can_index_custom_translated_record_with_l_param.csv',
+        ];
+        yield 'without_l_parameter' => [
+            'fixture' => 'can_index_custom_translated_record_without_l_param.csv',
+        ];
+        yield 'without_l_parameter_and_content_fallback' => [
+            'fixture' => 'can_index_custom_translated_record_without_l_param_and_content_fallback.csv',
+        ];
     }
 
-    /**
-     * @dataProvider getTranslatedRecordDataProvider
-     * @test
-     */
+    #[DataProvider('getTranslatedRecordDataProvider')]
+    #[Test]
     public function testCanIndexTranslatedCustomRecord(string $fixture): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
-
         $this->importCSVDataSet(__DIR__ . '/Fixtures/' . $fixture);
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -151,19 +149,14 @@ class IndexerTest extends IntegrationTestBase
         }
         self::assertStringContainsString('"url":"http://testone.site/de/?tx_foo%5Buid%5D=88', $solrContent, 'Can not build typolink as expected');
         self::assertStringContainsString('"url":"http://testone.site/de/?tx_foo%5Buid%5D=777', $solrContent, 'Can not build typolink as expected');
-
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
     }
 
     /**
      * This testcase should check if we can queue a custom record with ordered MM relations.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithMMRelationsInTheExpectedOrder(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_multiple_mm_relations.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -186,20 +179,16 @@ class IndexerTest extends IntegrationTestBase
         self::assertArrayHasKey('category_stringM', $solrDocs[0], 'Did not find MM related tags.');
         self::assertCount(2, $solrDocs[0]['category_stringM'], 'Did not find all MM related tags.');
         self::assertSame(['the tag', 'another tag'], $solrDocs[0]['category_stringM']);
-
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     /**
      * This testcase should check if we can queue a custom record with MM relations.
      *
-     * @test
      * @todo: this test might not be working as it does not check for L parameters. Should be revised
      */
+    #[Test]
     public function canIndexTranslatedItemWithMMRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_translated_record_with_mm_relation.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -212,19 +201,14 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"category_stringM":["translated tag"]', $solrContent, 'Did not find MM related tag');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"translation"', $solrContent, 'Could not index document into solr');
-
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
     }
 
     /**
      * This testcase should check if we can queue a custom record with multiple MM relations.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexMultipleMMRelatedItems(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_multiple_mm_relations.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -240,18 +224,14 @@ class IndexerTest extends IntegrationTestBase
         self::assertSame(['the tag', 'another tag'], $tags, 'Did not find MM related tags');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"testnews"', $solrContent, 'Could not index document into solr');
-
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     /**
      * This testcase should check if we can queue a custom record with MM relations and respect the additionalWhere clause.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithMMRelationAndAdditionalWhere(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_mm_relationAndAdditionalWhere.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -264,18 +244,14 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"category_stringM":["another tag"]', $solrContent, 'Did not find MM related tag');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"testnews"', $solrContent, 'Could not index document into solr');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     /**
      * This testcase should check if we can queue a custom record with MM relations and respect the additionalWhere clause.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithMMRelationToATranslatedPage(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_translated_record_with_mm_relation_to_a_page.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 88);
@@ -290,19 +266,14 @@ class IndexerTest extends IntegrationTestBase
 
         self::assertStringContainsString('"relatedPageTitles_stringM":["Related page"]', $solrContentEn, 'Can not find related page title');
         self::assertStringContainsString('"relatedPageTitles_stringM":["Translated related page"]', $solrContentDe, 'Can not find translated related page title');
-
-        $this->cleanUpSolrServerAndAssertEmpty();
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
     }
 
     /**
      * This testcase is used to check if direct relations can be resolved with the RELATION configuration
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithDirectRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_direct_relation.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 111);
@@ -318,17 +289,14 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"sysCategoryId_stringM":["1"]', $solrContent, 'Uid of related sys_category couldn\'t be resolved by using "foreignLabelField"');
         self::assertStringContainsString('"sysCategory_stringM":["sys_category"]', $solrContent, 'Label of related sys_category couldn\'t be resolved by using "foreignLabelField" and "enableRecursiveValueResolution"');
         self::assertStringContainsString('"sysCategoryDescription_stringM":["sys_category description"]', $solrContent, 'Description of related sys_category couldn\'t be resolved by using "foreignLabelField" and "enableRecursiveValueResolution"');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     /**
      * This testcase is used to check if multiple direct relations can be resolved with the RELATION configuration
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithMultipleDirectRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_multiple_direct_relations.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 111);
@@ -354,19 +322,15 @@ class IndexerTest extends IntegrationTestBase
         // @extensionScannerIgnoreLine
         $sysCategoryDescription_stringM = $decodedSolrContent->response->docs[0]->sysCategoryDescription_stringM;
         self::assertSame(['sys_category description', 'second sys_category description'], $sysCategoryDescription_stringM, 'Unexpected sysCategoryDescription_stringM value');
-
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     /**
      * This testcase is used to check if direct relations can be resolved with the RELATION configuration
      * and could be limited with an additionalWhere clause at the same time
-     *
-     * @test
      */
+    #[Test]
     public function canIndexItemWithDirectRelationAndAdditionalWhere(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_direct_relationAndAdditionalWhere.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 111);
@@ -379,15 +343,11 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"category_stringM":["another category"]', $solrContent, 'Did not find direct related category');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"testnews"', $solrContent, 'Could not index document into solr');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canUseConfigurationFromTemplateInRootLine(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_with_configuration_in_rootline.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 111);
@@ -400,12 +360,9 @@ class IndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"fieldFromRootLine_stringS":"TESTNEWS"', $solrContent, 'Did not find field configured in rootline');
         self::assertStringContainsString('"title":"testnews"', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetAdditionalDocumentsViaPsr14EventListener(): void
     {
         $this->importCSVDataSet(__DIR__ . '/../Fixtures/sites_setup_and_data_set/01_integration_tree_one.csv');
@@ -422,12 +379,9 @@ class IndexerTest extends IntegrationTestBase
         self::assertEquals(['can-be-an-alternative-record' => 'additional-test-document'], $result[1]->getFields());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanIndexCustomRecordOutsideOfSiteRoot(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_outside_site_root.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 111);
@@ -440,15 +394,11 @@ class IndexerTest extends IntegrationTestBase
 
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"title":"external testnews"', $solrContent, 'Could not index document into solr');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanIndexCustomRecordOutsideOfSiteRootWithTemplate(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_record_outside_site_root_with_template.csv');
 
         $result = $this->addToQueueAndIndexRecord('tx_fakeextension_domain_model_bar', 1);
@@ -463,7 +413,6 @@ class IndexerTest extends IntegrationTestBase
         $solrContent = file_get_contents($this->getSolrConnectionUriAuthority() . '/solr/core_en/select?q=*:*&fq=site:testone.site');
         self::assertStringContainsString('"numFound":1', $solrContent, 'Could not index document into solr');
         self::assertStringContainsString('"url":"http://testone.site/en/"', $solrContent, 'Item was indexed with false site UID');
-        $this->cleanUpSolrServerAndAssertEmpty();
     }
 
     protected function addToQueueAndIndexRecord(string $table, int $uid): bool
@@ -481,9 +430,7 @@ class IndexerTest extends IntegrationTestBase
         return $result;
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getSolrConnectionsByItemReturnsNoDefaultConnectionIfRootPageIsHideDefaultLanguage(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_with_rootPage_set_to_hide_default_language.csv');
@@ -504,9 +451,7 @@ class IndexerTest extends IntegrationTestBase
         self::assertArrayNotHasKey(0, $result, 'Expect, that there is no solr connection returned for default language,');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getSolrConnectionsByItemReturnsNoDefaultConnectionDefaultLanguageIsHiddenInSiteConfig(): void
     {
         $this->writeDefaultSolrTestSiteConfiguration();
@@ -529,12 +474,9 @@ class IndexerTest extends IntegrationTestBase
         self::assertArrayNotHasKey(0, $result, 'Expect, that there is no solr connection returned for default language,');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getSolrConnectionsByItemReturnsProperItemInNestedSite(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
         $this->writeDefaultSolrTestSiteConfiguration();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_with_multiple_sites.csv');
         $result = $this->addToQueueAndIndexRecord('pages', 1);

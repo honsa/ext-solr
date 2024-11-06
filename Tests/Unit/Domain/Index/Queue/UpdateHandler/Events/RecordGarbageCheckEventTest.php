@@ -17,11 +17,10 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Index\Queue\UpdateHandler\Ev
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\AbstractDataUpdateEvent;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\RecordGarbageCheckEvent;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the RecordGarbageCheckEvent
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 class RecordGarbageCheckEventTest extends SetUpDataUpdateEvent
 {
@@ -29,10 +28,9 @@ class RecordGarbageCheckEventTest extends SetUpDataUpdateEvent
     protected const EVENT_TEST_TABLE = 'tx_foo_bar';
 
     /**
-     * @test
-     *
      * @return AbstractDataUpdateEvent
      */
+    #[Test]
     public function canInitAndReturnBasicProperties(): AbstractDataUpdateEvent
     {
         /** @var RecordGarbageCheckEvent $event */
@@ -44,9 +42,7 @@ class RecordGarbageCheckEventTest extends SetUpDataUpdateEvent
         return $event;
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canInitAndReturnFrontendGroupsRemovedFlag(): void
     {
         $event = new RecordGarbageCheckEvent(123, 'tx_foo_bar', [], true);

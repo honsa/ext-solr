@@ -31,8 +31,6 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
  * A worker processing the queued data update events
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 final class EventQueueWorkerTask extends AbstractTask
 {
@@ -155,7 +153,7 @@ final class EventQueueWorkerTask extends AbstractTask
      */
     protected function getSolrLogManager(): SolrLogManager
     {
-        return  GeneralUtility::makeInstance(SolrLogManager::class, __CLASS__);
+        return GeneralUtility::makeInstance(SolrLogManager::class, __CLASS__);
     }
 
     /**

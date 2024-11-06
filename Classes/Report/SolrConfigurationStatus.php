@@ -31,8 +31,6 @@ use TYPO3\CMS\Reports\Status;
 /**
  * Provides a status report, which checks whether the configuration of the
  * extension is ok.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class SolrConfigurationStatus extends AbstractSolrStatus
 {
@@ -151,18 +149,15 @@ class SolrConfigurationStatus extends AbstractSolrStatus
                 if ($solrIsEnabledAndIndexingDisabled) {
                     $rootPagesWithIndexingOff[] = $rootPage;
                 }
-                /** @phpstan-ignore-next-line */
             } catch (RuntimeException) {
                 $rootPagesWithIndexingOff[] = $rootPage;
-                /** @phpstan-ignore-next-line */
-            } catch (ServiceUnavailableException $sue) {
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ServiceUnavailableException $sue) {
                 if ($sue->getCode() == 1294587218) {
                     //  No TypoScript template found, continue with next site
                     $rootPagesWithIndexingOff[] = $rootPage;
                     continue;
                 }
-                /** @phpstan-ignore-next-line */
-            } catch (SiteNotFoundException $sue) {
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (SiteNotFoundException $sue) {
                 if ($sue->getCode() == 1521716622) {
                     //  No site found, continue with next site
                     $rootPagesWithIndexingOff[] = $rootPage;
@@ -190,8 +185,6 @@ class SolrConfigurationStatus extends AbstractSolrStatus
 
     /**
      * Checks if the solr plugin is enabled with plugin.tx_solr.enabled.
-     *
-     * @throws DBALException
      */
     protected function getIsSolrEnabled(int $pageUid): bool
     {
@@ -200,13 +193,11 @@ class SolrConfigurationStatus extends AbstractSolrStatus
 
     /**
      * Checks if the indexing is enabled with config.index_enable
-     *
-     * @throws DBALException
      */
     protected function getIsIndexingEnabled(int $pageUid): bool
     {
         return (bool)$this->frontendEnvironment
-            ->getConfigurationFromPageId($pageUid)
+            ->getSolrConfigurationFromPageId($pageUid)
             ->getValueByPathOrDefaultValue('config.index_enable', false);
     }
 }

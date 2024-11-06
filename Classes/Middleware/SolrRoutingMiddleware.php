@@ -49,7 +49,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *   ]
  * ];
  *
- * @author Lars Tode <lars.tode@dkd.de>
  * @see https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/RequestHandling/Index.html
  */
 class SolrRoutingMiddleware implements MiddlewareInterface, LoggerAwareInterface
@@ -302,7 +301,7 @@ class SolrRoutingMiddleware implements MiddlewareInterface, LoggerAwareInterface
                     sprintf(
                         $message,
                         $path,
-                        $this->language->getTwoLetterIsoCode(),
+                        $this->language->getLocale()->getLanguageCode(),
                         $uri->getPath()
                     )
                 );

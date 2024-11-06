@@ -21,8 +21,6 @@ use RuntimeException;
 
 /**
  * Index Queue Page Indexer response to provide data for requested actions.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexerResponse
 {
@@ -78,7 +76,7 @@ class PageIndexerResponse
         if (empty($action)) {
             return $this->results;
         }
-        return $this->results[$action];
+        return $this->results[$action] ?? null;
     }
 
     /**

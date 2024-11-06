@@ -20,18 +20,15 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\GroupItem;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\GroupItemCollection;
 use ApacheSolrForTypo3\Solr\Domain\Search\SearchRequest;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Unit test case for the Group class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class GroupTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function testCanGroupName()
+    #[Test]
+    public function testCanGroupName(): void
     {
         $group = new Group('typeGroup');
         self::assertSame('typeGroup', $group->getGroupName(), 'Can not getGroupName from group');
@@ -40,19 +37,15 @@ class GroupTest extends SetUpUnitTestCase
         self::assertSame('changedTypeGroup', $group->getGroupName(), 'Can not getGroupName from group');
     }
 
-    /**
-     * @test
-     */
-    public function canGetGroupItemsReturnEmptyCollection()
+    #[Test]
+    public function canGetGroupItemsReturnEmptyCollection(): void
     {
         $group = new Group('typeGroup');
         self::assertSame(0, $group->getGroupItems()->getCount(), 'Can not get empty groupItem collection');
     }
 
-    /**
-     * @test
-     */
-    public function canGetResultsPerPage()
+    #[Test]
+    public function canGetResultsPerPage(): void
     {
         $group = new Group('typeGroup', 22);
         self::assertSame(22, $group->getResultsPerPage(), 'Can not get results per page');
@@ -61,10 +54,8 @@ class GroupTest extends SetUpUnitTestCase
         self::assertSame(11, $group->getResultsPerPage(), 'Can not get results per page');
     }
 
-    /**
-     * @test
-     */
-    public function canSetGroupItems()
+    #[Test]
+    public function canSetGroupItems(): void
     {
         $group = new Group('typeGroup', 10);
         $groupItems = new GroupItemCollection();
@@ -83,10 +74,8 @@ class GroupTest extends SetUpUnitTestCase
         self::assertSame($groupItems, $group->getGroupItems(), 'Can not get group items from group');
     }
 
-    /**
-     * @test
-     */
-    public function canAddGroupItem()
+    #[Test]
+    public function canAddGroupItem(): void
     {
         $group = new Group('typeGroup', 10);
 

@@ -189,16 +189,6 @@ Defines additional pages to take into account when indexing records for example.
 Additional page IDs can be provided as comma-separated list.
 
 
-queue.[indexConfig].table
--------------------------
-
-:Type: String
-:TS Path: plugin.tx_solr.index.queue.[indexConfig].table
-:Since: 2.0
-:Deprecated: 11.5.1
-
-Defines the type to index, which is usally the database table. Setting the record type via 'table' is deprecated and will be removed in v13, use 'type' instead.
-
 queue.[indexConfig].type
 -------------------------
 
@@ -598,6 +588,25 @@ The current record's field name to use to resolve the relation to the foreign ta
 :Since: 2.0
 
 Usually the label field to retrieve from the related records is determined automatically using TCA, using this option the desired field can be specified explicitly. To specify the label field for recursive relations, the field names can be separated by a dot, e.g. for a category hierarchy to get the name of the parent category one could use "parent.name" (since version:2.9).
+
+**foreignLabel**
+
+:Type: String
+:TS Path: plugin.tx_solr.index.queue.[indexConfig].fields.[fieldName].foreignLabel
+:Since: 12.1
+
+Defines how to build the label for indexing, stdWrap is applied. Can be used to overrule foreignLabelField. Referencing to "field" e.g. inside dataWrap will resolve to resolved record.
+
+Example:
+
+.. code-block:: typoscript
+
+   authorsNames_stringM = SOLR_RELATION
+   authorsNames_stringM {
+       localField = author
+       foreignLabel.dataWrap = {field : first_name} {field : last_name}
+       multiValue = 1
+   }
 
 **multiValue**
 

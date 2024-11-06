@@ -17,6 +17,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\System\Records\Pages;
 
 use ApacheSolrForTypo3\Solr\System\Records\Pages\PagesRepository;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -35,10 +36,8 @@ class PagesRepositoryTest extends IntegrationTestBase
         $this->repository = GeneralUtility::makeInstance(PagesRepository::class);
     }
 
-    /**
-     * @test
-     */
-    public function canFindAllRootPages()
+    #[Test]
+    public function canFindAllRootPages(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/pages.csv');
 
@@ -56,30 +55,8 @@ class PagesRepositoryTest extends IntegrationTestBase
         self::assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @test
-     *
-     * There is following scenario:
-     *
-     * [0]
-     * |
-     * ——[ 1] Page (Root)
-     * |   |
-     * |   ——[14] Mount Point 1 (to [24] to show contents from) <—— Try to find this
-     * |
-     * ——[ 3] Page2 (Root)
-     * |  |
-     * |   ——[34] Mount Point 2 (to [25] to show contents from) <—— Try to find this
-     * |
-     * ——[20] Shared-Pages (Folder: Not root)
-     * |   |
-     * |   ——[24] FirstShared
-     * |       |
-     * |       ——[25] first subpage from FirstShared
-     * |       |
-     * |       ——[26] second subpage from FirstShared
-     */
-    public function canfindMountPointPagesByRootLineParentPageIdsIfMountedPagesIsOutsideOfTheSite()
+    #[Test]
+    public function canfindMountPointPagesByRootLineParentPageIdsIfMountedPagesIsOutsideOfTheSite(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_find_mount_pages_in_rootline.csv');
 

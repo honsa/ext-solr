@@ -18,11 +18,10 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\DefaultFacetQueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class DefaultFacetQueryBuilderTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class DefaultFacetQueryBuilderTest extends SetUpUnitTestCase
 {
@@ -39,10 +38,9 @@ class DefaultFacetQueryBuilderTest extends SetUpUnitTestCase
      *       }
      *    }
      * }
-     *
-     * @test
      */
-    public function testWhenKeepAllOptionsOnSelectionIsNotConfiguredNoExcludeTagIsAdded()
+    #[Test]
+    public function testWhenKeepAllOptionsOnSelectionIsNotConfiguredNoExcludeTagIsAdded(): void
     {
         $fakeConfigurationArray = [];
         $fakeConfigurationArray['plugin.']['tx_solr.']['search.']['faceting'] = 1;

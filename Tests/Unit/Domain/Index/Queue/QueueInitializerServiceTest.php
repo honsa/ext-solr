@@ -40,14 +40,9 @@ use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use TYPO3\CMS\Core\EventDispatcher\NoopEventDispatcher;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class QueueInitializerServiceTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function allIndexConfigurationsAreUsedWhenWildcardIsPassed(): void
     {
         $queueMock = $this->createMock(Queue::class);

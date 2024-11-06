@@ -16,47 +16,38 @@
 namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Index\Queue\UpdateHandler\Events;
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\ContentElementDeletedEvent;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the ContentElementDeletedEvent
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 class ContentElementDeletedEventTest extends SetUpDataUpdateEvent
 {
     protected const EVENT_CLASS = ContentElementDeletedEvent::class;
     protected const EVENT_TEST_TABLE = 'tt_content';
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canInitAndReturnFields(): void
     {
         $event = new ContentElementDeletedEvent(123);
         self::assertEmpty($event->getFields());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canForceTable(): void
     {
         $event = new ContentElementDeletedEvent(123);
         self::assertEquals('tt_content', $event->getTable());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndicatePageUpdate(): void
     {
         $event = new ContentElementDeletedEvent(123);
         self::assertFalse($event->isPageUpdate());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndicateContentElementUpdate(): void
     {
         $event = new ContentElementDeletedEvent(123);

@@ -17,17 +17,13 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\ViewHelpers\Uri\Facet;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Uri\SearchUriBuilder;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Uri\Facet\RemoveFacetItemViewHelper;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class RemoveFacetItemViewHelperTest extends SetUpFacetItemViewHelper
 {
-    /**
-     * @test
-     */
-    public function removeFacetItemWillUseUriBuilderAsExpected()
+    #[Test]
+    public function removeFacetItemWillUseUriBuilderAsExpected(): void
     {
         $facet = $this->getTestColorFacet();
 

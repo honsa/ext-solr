@@ -19,20 +19,17 @@ use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\DataUpdateHandler;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\Events\AbstractDataUpdateEvent;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\GarbageHandler;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Abstract testcase for the data update events
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
 {
     protected const EVENT_CLASS = AbstractDataUpdateEvent::class;
     protected const EVENT_TEST_TABLE = 'tx_foo_bar';
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canInitAndReturnBasicProperties(): AbstractDataUpdateEvent
     {
         $eventClass = static::EVENT_CLASS;
@@ -49,9 +46,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         return $event;
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canInitAndReturnFields(): void
     {
         $eventClass = static::EVENT_CLASS;
@@ -60,9 +55,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         self::assertEquals($fields, $event->getFields());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndicatePageUpdate(): void
     {
         $eventClass = static::EVENT_CLASS;
@@ -76,9 +69,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         self::assertTrue($event->isPageUpdate());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndicateContentElementUpdate(): void
     {
         $eventClass = static::EVENT_CLASS;
@@ -90,9 +81,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         self::assertTrue($event->isContentElementUpdate());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canMarkAndIndicateStoppedProcessing(): void
     {
         $eventClass = static::EVENT_CLASS;
@@ -105,9 +94,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         self::assertFalse($event->isPropagationStopped());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canMarkAndIndicateForcedProcessing(): void
     {
         $eventClass = static::EVENT_CLASS;
@@ -120,9 +107,7 @@ abstract class SetUpDataUpdateEvent extends SetUpUnitTestCase
         self::assertFalse($event->isImmediateProcessingForced());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCleanEventOnSerialization(): void
     {
         $fields = [

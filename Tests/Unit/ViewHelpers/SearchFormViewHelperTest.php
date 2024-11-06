@@ -19,7 +19,9 @@ use ApacheSolrForTypo3\Solr\Controller\SearchController;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use ApacheSolrForTypo3\Solr\ViewHelpers\SearchFormViewHelper;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
@@ -30,9 +32,6 @@ use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3Fluid\Fluid\Core\Cache\FluidCacheInterface;
 use TYPO3Fluid\Fluid\Core\Variables\VariableProviderInterface;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class SearchFormViewHelperTest extends SetUpUnitTestCase
 {
     protected MockObject|SearchFormViewHelper $viewHelper;
@@ -55,7 +54,6 @@ class SearchFormViewHelperTest extends SetUpUnitTestCase
                 'getTemplateVariableContainer',
                 'getSearchResultSet',
                 'renderChildren',
-                'getIsSiteManagedSite',
             ])
             ->getMock();
         $renderingContext = new RenderingContext(
@@ -66,12 +64,11 @@ class SearchFormViewHelperTest extends SetUpUnitTestCase
             new TemplatePaths()
         );
         $request = new Request((new ServerRequest())->withAttribute('extbase', new ExtbaseRequestParameters(SearchController::class)));
-        $renderingContext->setRequest($request);
+        $renderingContext->setAttribute(ServerRequestInterface::class, $request);
         $this->viewHelper->setRenderingContext($renderingContext);
         $this->viewHelper->expects(self::any())->method('getTypoScriptConfiguration')->willReturn($this->typoScriptConfigurationMock);
         $this->viewHelper->expects(self::any())->method('getTemplateVariableContainer')->willReturn($this->createMock(VariableProviderInterface::class));
         $this->viewHelper->expects(self::once())->method('renderChildren')->willReturn('');
-        $this->viewHelper->expects(self::once())->method('getIsSiteManagedSite')->willReturn(false);
         parent::setUp();
     }
 
@@ -93,10 +90,8 @@ class SearchFormViewHelperTest extends SetUpUnitTestCase
         $this->uriBuilderMock->expects(self::once())->method('build')->willReturn('index.php?id=' . $pageUid);
     }
 
-    /**
-     * @test
-     */
-    public function canSetTargetPageUidFromConfigurationWhenNullWasPassed()
+    #[Test]
+    public function canSetTargetPageUidFromConfigurationWhenNullWasPassed(): void
     {
         $this->typoScriptConfigurationMock->expects(self::any())->method('getSearchTargetPage')->willReturn(888);
         $this->viewHelper->expects(self::once())->method('getSearchResultSet')->willReturn(null);
@@ -106,10 +101,8 @@ class SearchFormViewHelperTest extends SetUpUnitTestCase
         $this->viewHelper->render();
     }
 
-    /**
-     * @test
-     */
-    public function canUsePassedPageUidWhenNoTargetPageIsConfigured()
+    #[Test]
+    public function canUsePassedPageUidWhenNoTargetPageIsConfigured(): void
     {
         $this->typoScriptConfigurationMock->expects(self::any())->method('getSearchTargetPage')->willReturn(0);
         $this->viewHelper->expects(self::once())->method('getSearchResultSet')->willReturn(null);
@@ -119,10 +112,8 @@ class SearchFormViewHelperTest extends SetUpUnitTestCase
         $this->viewHelper->render();
     }
 
-    /**
-     * @test
-     */
-    public function passedPageUidHasPriorityOverConfiguredTargetPageUid()
+    #[Test]
+    public function passedPageUidHasPriorityOverConfiguredTargetPageUid(): void
     {
         $this->typoScriptConfigurationMock->expects(self::any())->method('getSearchTargetPage')->willReturn(888);
         $this->viewHelper->expects(self::once())->method('getSearchResultSet')->willReturn(null);

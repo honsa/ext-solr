@@ -20,14 +20,13 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Service;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Service\ConfigurationService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class ConfigurationServiceTest extends SetUpUnitTestCase
 {
     public static function escapeFilterDataProvider(): Traversable
@@ -64,10 +63,8 @@ class ConfigurationServiceTest extends SetUpUnitTestCase
         yield ['title', '\(1\+1\)\:2', '\(1\+1\)\:2'];
     }
 
-    /**
-     * @dataProvider escapeFilterDataProvider
-     * @test
-     */
+    #[DataProvider('escapeFilterDataProvider')]
+    #[Test]
     public function isFlexFormFilterEscaped(string $filterField, $filterValue, string $expectedFilterString): void
     {
         $fakeFlexFormArrayData = [
@@ -101,10 +98,8 @@ class ConfigurationServiceTest extends SetUpUnitTestCase
         yield ['title', 'test', 'title:test'];
     }
 
-    /**
-     * @dataProvider overrideFilterDataProvider
-     * @test
-     */
+    #[DataProvider('overrideFilterDataProvider')]
+    #[Test]
     public function canOverrideConfigurationWithFlexFormSettings(
         string $filterField,
         $filterValue,

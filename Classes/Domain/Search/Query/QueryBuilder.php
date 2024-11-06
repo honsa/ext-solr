@@ -43,8 +43,6 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * The concrete QueryBuilder contains all TYPO3 specific initialization logic of solr queries, for TYPO3.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class QueryBuilder extends AbstractQueryBuilder
 {
@@ -375,7 +373,7 @@ class QueryBuilder extends AbstractQueryBuilder
                     $searchQueryFilters['__pageSections.']
                 );
             }
-            $pageIds = GeneralUtility::trimExplode(',', $searchQueryFilters['__pageSections']);
+            $pageIds = GeneralUtility::trimExplode(',', (string)$searchQueryFilters['__pageSections']);
             $this->usePageSectionsFromPageIds($pageIds);
             $this->typoScriptConfiguration->removeSearchQueryFilterForPageSections();
         }

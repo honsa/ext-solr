@@ -22,10 +22,13 @@ use ApacheSolrForTypo3\Solr\Domain\Search\Query\QueryBuilder;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site;
 use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use ApacheSolrForTypo3\Solr\Search;
+use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
+use stdClass;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,25 +36,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class RepositoryTest extends SetUpUnitTestCase
 {
-    /**
-     * @var Search
-     */
-    protected $search;
+    protected Search $search;
+    protected ConnectionManager $solrConnectionManager;
+    protected Site $mockedAsSingletonSite;
 
-    /**
-     * @var ConnectionManager
-     */
-    protected $solrConnectionManager;
-
-    /**
-     * @var Site
-     */
-    protected $mockedAsSingletonSite;
-
-    /**
-     * @test
-     */
-    public function findOneByPageIdAndByLanguageIdReturnsFirstFoundDocument()
+    #[Test]
+    public function findOneByPageIdAndByLanguageIdReturnsFirstFoundDocument(): void
     {
         $apacheSolrDocumentCollection = [new Document(), new Document()];
         $apacheSolrDocumentRepository = $this->getAccessibleMock(
@@ -71,10 +61,8 @@ class RepositoryTest extends SetUpUnitTestCase
         self::assertSame($apacheSolrDocumentCollection[0], $apacheSolrDocumentRepository->findOneByPageIdAndByLanguageId(0, 0));
     }
 
-    /**
-     * @test
-     */
-    public function findByPageIdAndByLanguageIdReturnsEmptyCollectionIfConnectionToSolrServerCanNotBeEstablished()
+    #[Test]
+    public function findByPageIdAndByLanguageIdReturnsEmptyCollectionIfConnectionToSolrServerCanNotBeEstablished(): void
     {
         $apacheSolrDocumentRepository = $this->getAccessibleMock(
             Repository::class,
@@ -92,10 +80,8 @@ class RepositoryTest extends SetUpUnitTestCase
         self::assertEmpty($apacheSolrDocumentCollection);
     }
 
-    /**
-     * @test
-     */
-    public function findByPageIdAndByLanguageIdReturnsResultFromSearch()
+    #[Test]
+    public function findByPageIdAndByLanguageIdReturnsResultFromSearch(): void
     {
         $solrConnectionMock = $this->createMock(SolrConnection::class);
         $solrConnectionManager = $this->getAccessibleMock(ConnectionManager::class, ['getConnectionByPageId'], [], '', false);
@@ -108,9 +94,9 @@ class RepositoryTest extends SetUpUnitTestCase
 
         $testDocuments = [new Document(), new Document()];
 
-        $parsedData = new \stdClass();
+        $parsedData = new stdClass();
         // @extensionScannerIgnoreLine
-        $parsedData->response = new \stdClass();
+        $parsedData->response = new stdClass();
         // @extensionScannerIgnoreLine
         $parsedData->response->docs = $testDocuments;
         $fakeResponse = $this->createMock(ResponseAdapter::class);
@@ -119,7 +105,17 @@ class RepositoryTest extends SetUpUnitTestCase
 
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
-        $apacheSolrDocumentRepository = $this->getAccessibleMock(Repository::class, ['getSearch'], [null, null, $queryBuilderMock]);
+        $apacheSolrDocumentRepository = $this->getAccessibleMock(
+            Repository::class,
+            [
+                'getSearch',
+            ],
+            [
+                null,
+                $this->createMock(TypoScriptConfiguration::class),
+                $queryBuilderMock,
+            ]
+        );
         $apacheSolrDocumentRepository->expects(self::once())->method('getSearch')->willReturn($search);
         $queryMock = $this->createMock(Query::class);
         $queryBuilderMock->expects(self::any())->method('buildPageQuery')->willReturn($queryMock);

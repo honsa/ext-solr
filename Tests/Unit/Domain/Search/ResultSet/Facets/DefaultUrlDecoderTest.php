@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\DefaultUrlDecoder;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class DefaultUrlEncoderTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class DefaultUrlDecoderTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canDecode()
+    #[Test]
+    public function canDecode(): void
     {
         $value = 'a + b';
         $encoder = new DefaultUrlDecoder();

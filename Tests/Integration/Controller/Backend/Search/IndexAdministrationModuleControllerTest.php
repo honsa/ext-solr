@@ -21,6 +21,7 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\System\Mvc\Backend\Service\ModuleDataStorageService;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -68,10 +69,8 @@ class IndexAdministrationModuleControllerTest extends IntegrationTestBase
         return $controller;
     }
 
-    /**
-     * @test
-     */
-    public function testReloadIndexConfigurationAction()
+    #[Test]
+    public function testReloadIndexConfigurationAction(): void
     {
         /** @var SiteRepository $siteRepository */
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);
@@ -84,10 +83,8 @@ class IndexAdministrationModuleControllerTest extends IntegrationTestBase
         $controller->reloadIndexConfigurationAction();
     }
 
-    /**
-     * @test
-     */
-    public function testEmptyIndexAction()
+    #[Test]
+    public function testEmptyIndexAction(): void
     {
         /** @var SiteRepository $siteRepository */
         $siteRepository = GeneralUtility::makeInstance(SiteRepository::class);

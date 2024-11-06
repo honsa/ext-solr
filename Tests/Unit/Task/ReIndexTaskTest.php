@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Task;
 
 use ApacheSolrForTypo3\Solr\Task\ReIndexTask;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for ReIndexTask
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class ReIndexTaskTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetErrorMessageInAdditionalInformationWhenSiteNotAvailable()
+    #[Test]
+    public function canGetErrorMessageInAdditionalInformationWhenSiteNotAvailable(): void
     {
         $indexQueuerWorker = $this->getMockBuilder(ReIndexTask::class)
             ->disableOriginalConstructor()

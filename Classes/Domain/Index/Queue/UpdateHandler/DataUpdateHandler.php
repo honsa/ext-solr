@@ -33,7 +33,6 @@ use ApacheSolrForTypo3\Solr\System\TCA\TCAService;
 use ApacheSolrForTypo3\Solr\Util;
 use Doctrine\DBAL\Exception as DBALException;
 use Throwable;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -246,7 +245,7 @@ class DataUpdateHandler extends AbstractUpdateHandler
         $this->applyPageChangesToQueue($uid);
 
         if ($previousParentId !== null) {
-            $pageRecord = BackendUtility::getRecord('pages', $uid);
+            $pageRecord = $this->getRecord('pages', $uid);
             if ($pageRecord !== null && (int)$pageRecord['pid'] !== $previousParentId) {
                 $treePageIds = $this->getSubPageIds($uid);
                 $this->updatePageIdItems($treePageIds);
@@ -385,6 +384,12 @@ class DataUpdateHandler extends AbstractUpdateHandler
         $this->updateCanonicalPages($uid);
         $this->mountPageUpdater->update($uid);
 
+        // We need to get the full record to find out if this is a page translation
+        $fullRecord = $this->getRecord('pages', $uid);
+        if (($fullRecord['sys_language_uid'] ?? null) > 0) {
+            $uid = (int)$fullRecord['l10n_parent'];
+        }
+
         $recursiveUpdateRequired = $this->isRecursivePageUpdateRequired($uid, $updatedFields);
         if ($recursiveUpdateRequired) {
             $treePageIds = $this->getSubPageIds($uid);
@@ -485,7 +490,7 @@ class DataUpdateHandler extends AbstractUpdateHandler
      */
     protected function getIsTranslationParentRecordEnabled(string $recordTable, int $recordUid): bool
     {
-        $l10nParentRecord = (array)BackendUtility::getRecord($recordTable, $recordUid, '*', '', false);
+        $l10nParentRecord = (array)$this->getRecord($recordTable, $recordUid, '*', '', false);
         return $this->tcaService->isEnabledRecord($recordTable, $l10nParentRecord);
     }
 

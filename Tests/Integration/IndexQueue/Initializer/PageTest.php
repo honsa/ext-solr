@@ -21,13 +21,12 @@ use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\Page;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase to test the page queue initializer
- *
- * @author Timo Schmidt
  */
 class PageTest extends IntegrationTestBase
 {
@@ -98,17 +97,16 @@ class PageTest extends IntegrationTestBase
      *      ------- 10 (Mounted)
      *                        |
      *                         ------------ 20 (Childpage of mountpoint)
-     *
-     * @test
      */
-    public function initializerIsFillingQueueWithMountPages()
+    #[Test]
+    public function initializerIsFillingQueueWithMountPages(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_add_mount_pages.csv');
 
         $this->assertEmptyQueue();
         $this->initializeAllPageIndexQueues();
 
-        $this->assertItemsInQueue(5);
+        $this->assertItemsInQueue(4);
 
         // @todo: verify, is this really as expected? since mount_pid_ol is not set
         // in the case when mount_pid_ol is set 4 pages get added
@@ -132,10 +130,9 @@ class PageTest extends IntegrationTestBase
      *      ——[ 1] Page (Root)
      *          |
      *          ——[14] Mounted Page (to [24] to show contents from)
-     *
-     * @test
      */
-    public function initializerIsFillingQueueWithMountedNonRootPages()
+    #[Test]
+    public function initializerIsFillingQueueWithMountedNonRootPages(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/mounted_shared_non_root_page_from_different_tree_can_be_indexed.csv');
         $this->assertEmptyQueue();
@@ -164,10 +161,9 @@ class PageTest extends IntegrationTestBase
      *      ——[ 1] Page (Root)
      *          |
      *          ——[14] Mount Point (to [24] to show contents from)
-     *
-     * @test
      */
-    public function initializerIsFillingQueueWithMountedRootPages()
+    #[Test]
+    public function initializerIsFillingQueueWithMountedRootPages(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/mounted_shared_root_page_from_different_tree_can_be_indexed.csv');
         $this->assertEmptyQueue();
@@ -203,10 +199,9 @@ class PageTest extends IntegrationTestBase
      *      ——[ 111] Page2 (Root)
      *          |
      *          ——[34] Mount Point 2 (to [24] to show contents from)
-     *
-     * @test
      */
-    public function initializerIsFillingQueuesWithMultipleSitesMounted()
+    #[Test]
+    public function initializerIsFillingQueuesWithMultipleSitesMounted(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/mounted_shared_page_from_multiple_trees_can_be_queued.csv');
         $this->assertEmptyQueue();
@@ -236,17 +231,16 @@ class PageTest extends IntegrationTestBase
     /**
      * Check if invalid mount page is ignored and messages were added to the flash
      * message queue
-     *
-     * @test
      */
-    public function initializerAddsInfoMessagesAboutInvalidMountPages()
+    #[Test]
+    public function initializerAddsInfoMessagesAboutInvalidMountPages(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_add_mount_pages.csv');
 
         $this->assertEmptyQueue();
         $this->initializeAllPageIndexQueues();
 
-        $this->assertItemsInQueue(5); // The root page of "testtwo.site aka integration_tree_two" is included.
+        $this->assertItemsInQueue(4); // The root page of "testtwo.site aka integration_tree_two" is included.
 
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
         $flashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('solr.queue.initializer');
@@ -268,9 +262,9 @@ class PageTest extends IntegrationTestBase
      *      |       ——[3] 2-nd level Subpage                                   (included in index)
      *      |
      *      ——[ 111] Root of Testpage testtwo.site aka integration_tree_two    (included in index)
-     * @test
      */
-    public function initializerDoesNotIgnoreSubPagesOfRestrictedByAdditionalWhereClauseParents()
+    #[Test]
+    public function initializerDoesNotIgnoreSubPagesOfRestrictedByAdditionalWhereClauseParents(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/initializer_does_not_ignore_sub_pages_of_restricted_by_additionalWhereClause_parents.csv');
         $this->assertEmptyQueue();

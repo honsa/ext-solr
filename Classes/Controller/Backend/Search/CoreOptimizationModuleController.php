@@ -19,6 +19,7 @@ use ApacheSolrForTypo3\Solr\Domain\Site\Exception\UnexpectedTYPO3SiteInitializat
 use ApacheSolrForTypo3\Solr\Utility\ManagedResourcesUtility;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\View\ViewInterface;
@@ -33,15 +34,15 @@ class CoreOptimizationModuleController extends AbstractModuleController
      * Set up the doc header properly here
      *
      * @throws UnexpectedTYPO3SiteInitializationException
+     * @param ViewInterface $view
      *
      * @noinspection PhpUnused
      */
-    protected function initializeView(ViewInterface $view): void
+    protected function initializeView($view): void
     {
         parent::initializeView($view);
+
         $this->generateCoreSelectorMenuUsingPageTree();
-        $coreOptimizationTabs = $this->moduleTemplate->getDynamicTabMenu([], 'coreOptimization');
-        $this->view->assign('tabs', $coreOptimizationTabs);
     }
 
     /**
@@ -52,8 +53,8 @@ class CoreOptimizationModuleController extends AbstractModuleController
     public function indexAction(): ResponseInterface
     {
         if ($this->selectedSolrCoreConnection === null) {
-            $this->view->assign('can_not_proceed', true);
-            return $this->getModuleTemplateResponse();
+            $this->moduleTemplate->assign('can_not_proceed', true);
+            return $this->moduleTemplate->renderResponse('Backend/Search/CoreOptimizationModule/Index');
         }
 
         $synonyms = [];
@@ -64,13 +65,13 @@ class CoreOptimizationModuleController extends AbstractModuleController
         }
 
         $stopWords = $coreAdmin->getStopWords();
-        $this->view->assignMultiple([
+        $this->moduleTemplate->assignMultiple([
             'synonyms' => $synonyms,
             'stopWords' => implode(PHP_EOL, $stopWords),
             'stopWordsCount' => count($stopWords),
         ]);
 
-        return $this->getModuleTemplateResponse();
+        return $this->moduleTemplate->renderResponse('Backend/Search/CoreOptimizationModule/Index');
     }
 
     /**
@@ -134,10 +135,19 @@ class CoreOptimizationModuleController extends AbstractModuleController
      * @noinspection PhpUnused
      */
     public function importSynonymListAction(
-        array $synonymFileUpload,
         bool $overrideExisting = false,
         bool $deleteSynonymsBefore = false
     ): ResponseInterface {
+        $synonymFileUpload = $this->request->getUploadedFiles()['synonymFileUpload'] ?? null;
+        if (!$synonymFileUpload instanceof UploadedFile) {
+            $this->addFlashMessage(
+                'Synonyms upload not found.',
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return new RedirectResponse($this->uriBuilder->uriFor('index'), 303);
+        }
+
         if ($deleteSynonymsBefore) {
             $this->deleteAllSynonyms();
         }
@@ -165,8 +175,18 @@ class CoreOptimizationModuleController extends AbstractModuleController
     /**
      * @noinspection PhpUnused
      */
-    public function importStopWordListAction(array $stopwordsFileUpload, bool $replaceStopwords): ResponseInterface
+    public function importStopWordListAction(bool $replaceStopwords): ResponseInterface
     {
+        $stopwordsFileUpload = $this->request->getUploadedFiles()['stopwordsFileUpload'] ?? null;
+        if (!$stopwordsFileUpload instanceof UploadedFile) {
+            $this->addFlashMessage(
+                'Stop Word upload not found.',
+                '',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return new RedirectResponse($this->uriBuilder->uriFor('index'), 303);
+        }
+
         $this->saveStopWordsAction(
             ManagedResourcesUtility::importStopwordsFromPlainTextContents($stopwordsFileUpload),
             $replaceStopwords
@@ -273,7 +293,7 @@ class CoreOptimizationModuleController extends AbstractModuleController
     protected function exportFile(string $content, string $type = 'synonyms', string $fileExtension = 'txt'): ResponseInterface
     {
         $coreAdmin = $this->selectedSolrCoreConnection->getAdminService();
-        return  $this->responseFactory->createResponse()
+        return $this->responseFactory->createResponse()
             ->withHeader('Content-Type', 'text/plain; charset=utf-8')
             ->withHeader('Cache-control', 'public')
             ->withHeader('Content-Description', 'File transfer')

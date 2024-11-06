@@ -18,14 +18,14 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Index\Queue\UpdateHandler\Ev
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\UpdateHandler\EventListener\AbstractBaseEventListener;
 use ApacheSolrForTypo3\Solr\System\Configuration\ExtensionConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Abstract testcase for the event listeners
- *
- * @author Markus Friedrich <markus.friedrich@dkd.de>
  */
 abstract class SetUpEventListener extends SetUpUnitTestCase
 {
@@ -54,9 +54,7 @@ abstract class SetUpEventListener extends SetUpUnitTestCase
      */
     abstract protected function initListener(): AbstractBaseEventListener;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndicateActiveMonitoring(): void
     {
         $this->extensionConfigurationMock
@@ -70,10 +68,9 @@ abstract class SetUpEventListener extends SetUpUnitTestCase
 
     /**
      * @param int $currentType
-     *
-     * @test
-     * @dataProvider inactiveMonitoringDataProvider
      */
+    #[DataProvider('inactiveMonitoringDataProvider')]
+    #[Test]
     public function canIndicateInactiveMonitoring(int $currentType): void
     {
         $this->extensionConfigurationMock

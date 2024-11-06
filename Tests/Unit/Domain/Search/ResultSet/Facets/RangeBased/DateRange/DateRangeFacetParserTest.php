@@ -18,18 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rang
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\DateRange\DateRangeFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\DateRange\DateRangeFacetParser;
 use ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\SetUpFacetParser;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class DateRangeFacetParserTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class DateRangeFacetParserTest extends SetUpFacetParser
 {
-    /**
-     * @test
-     */
-    public function facetIsCreated()
+    #[Test]
+    public function facetIsCreated(): void
     {
         $facetConfiguration = [
             'myCreated.' => [
@@ -53,7 +50,7 @@ class DateRangeFacetParserTest extends SetUpFacetParser
         self::assertSame($facet->getConfiguration(), $facetConfiguration['myCreated.'], 'Configuration was not passed to new facets');
         self::assertTrue($facet->getIsUsed());
 
-        self::assertEquals('201506020000-201706020000', $facet->getRange()->getLabel());
+        self::assertEquals('201506020000-201706022359', $facet->getRange()->getLabel());
         self::assertEquals(32, $facet->getRange()->getDocumentCount());
         self::assertCount(3, $facet->getRange()->getRangeCounts(), 'We expected that there are three count items attached');
 

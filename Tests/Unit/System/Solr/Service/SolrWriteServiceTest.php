@@ -17,6 +17,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Solr\Service;
 
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Solarium\Client;
 use Solarium\Core\Client\Response;
@@ -25,8 +26,6 @@ use Solarium\QueryType\Update\Result;
 
 /**
  * Tests the ApacheSolrForTypo3\Solr\SolrService class
- *
- * @author Jens Jacobsen <typo3@jens-jacobsen.de>
  */
 class SolrWriteServiceTest extends SetUpUnitTestCase
 {
@@ -47,9 +46,7 @@ class SolrWriteServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRunOptimizeIndex(): void
     {
         $this->responseMock->expects(self::once())->method('getStatusCode')->willReturn(200);

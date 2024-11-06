@@ -20,17 +20,14 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\O
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\OptionsFacet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use ApacheSolrForTypo3\Solr\ViewHelpers\Facet\Options\Group\Prefix\LabelFilterViewHelper;
+use PHPUnit\Framework\Attributes\Test;
+use TYPO3Fluid\Fluid\Core\Parser\SyntaxTree\ViewHelperNode;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\Variables\StandardVariableProvider;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class LabelFilterViewHelperTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function canMakeOnlyExpectedFacetsAvailableInStaticContext(): void
     {
         $facet = $this->createMock(OptionsFacet::class);
@@ -55,7 +52,12 @@ class LabelFilterViewHelperTest extends SetUpUnitTestCase
         $testArguments['options'] = $optionCollection;
         $testArguments['prefix'] = 'p';
 
-        LabelFilterViewHelper::renderStatic($testArguments, function () {}, $renderingContextMock);
+        $labelFilterViewHelperTestable = new LabelFilterViewHelper();
+        $labelFilterViewHelperTestable->setRenderingContext($renderingContextMock);
+        $labelFilterViewHelperTestable->setArguments($testArguments);
+        $labelFilterViewHelperTestable->setViewHelperNode($this->createMock(ViewHelperNode::class));
+        $labelFilterViewHelperTestable->render();
+
         self::assertTrue($variableContainer->exists('filteredOptions'), 'Expected that filteredOptions has been set');
 
         /** @var OptionCollection $optionCollection */
@@ -64,9 +66,7 @@ class LabelFilterViewHelperTest extends SetUpUnitTestCase
         self::assertSame('Polar Blue', $optionCollection->getByPosition(0)->getLabel(), 'Filtered option has unexpected label');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canMakeOnlyExpectedFacetsAvailableInStaticContextWithMultiByteCharacters(): void
     {
         $facet = $this->createMock(OptionsFacet::class);
@@ -85,7 +85,11 @@ class LabelFilterViewHelperTest extends SetUpUnitTestCase
         $testArguments['options'] = $optionCollection;
         $testArguments['prefix'] = 'ø';
 
-        LabelFilterViewHelper::renderStatic($testArguments, function () {}, $renderingContextMock);
+        $labelFilterViewHelperTestable = new LabelFilterViewHelper();
+        $labelFilterViewHelperTestable->setRenderingContext($renderingContextMock);
+        $labelFilterViewHelperTestable->setArguments($testArguments);
+        $labelFilterViewHelperTestable->setViewHelperNode($this->createMock(ViewHelperNode::class));
+        $labelFilterViewHelperTestable->render();
         self::assertTrue($variableContainer->exists('filteredOptions'), 'Expected that filteredOptions has been set');
 
         /** @var OptionCollection $optionCollection */

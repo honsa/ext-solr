@@ -22,18 +22,20 @@ use ApacheSolrForTypo3\Solr\System\Solr\Parser\StopWordParser;
 use ApacheSolrForTypo3\Solr\System\Solr\Parser\SynonymParser;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Solarium\Client;
 use Solarium\Core\Client\Endpoint;
+use Throwable;
 use Traversable;
 
 /**
  * Class SolrConnectionTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SolrConnectionTest extends SetUpUnitTestCase
 {
@@ -78,15 +80,16 @@ class SolrConnectionTest extends SetUpUnitTestCase
                 $streamFactory ?? $this->createMock(StreamFactoryInterface::class),
                 $eventDispatcher ?? $this->createMock(EventDispatcherInterface::class)
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable) {
             // No exception will be ever happen, this is for saving up the lines in test cases.
         }
         return null;
     }
 
     /**
-     * @test
+     * @throws MockObjectException
      */
+    #[Test]
     public function authenticationIsNotTriggeredWithoutUsername(): void
     {
         $endpointMock = $this->createMock(Endpoint::class);
@@ -105,8 +108,9 @@ class SolrConnectionTest extends SetUpUnitTestCase
     }
 
     /**
-     * @test
+     * @throws MockObjectException
      */
+    #[Test]
     public function authenticationIsTriggeredWhenUsernameIsPassed(): void
     {
         $endpointMock = $this->createMock(Endpoint::class);
@@ -126,14 +130,15 @@ class SolrConnectionTest extends SetUpUnitTestCase
 
     public static function coreNameDataProvider(): Traversable
     {
-        yield ['path' => '/solr/', 'core' => 'bla', 'expectedName' => 'bla'];
-        yield ['path' => '/somewherelese/solr/', 'core' => 'corename', 'expectedName' => 'corename'];
+        yield ['path' => '/solr/', 'core' => 'bla', 'expectedCoreName' => 'bla'];
+        yield ['path' => '/somewherelese/solr/', 'core' => 'corename', 'expectedCoreName' => 'corename'];
     }
 
     /**
-     * @dataProvider coreNameDataProvider
-     * @test
+     * @throws MockObjectException
      */
+    #[DataProvider('coreNameDataProvider')]
+    #[Test]
     public function canGetCoreName(string $path, string $core, string $expectedCoreName): void
     {
         $fakeConfiguration = $this->createMock(TypoScriptConfiguration::class);
@@ -147,14 +152,12 @@ class SolrConnectionTest extends SetUpUnitTestCase
 
     public static function coreBasePathDataProvider(): Traversable
     {
-        yield ['path' => '/', '' => 'bla', 'expectedPath' => ''];
+        yield ['path' => '/', 'core' => 'bla', 'expectedCoreBasePath' => ''];
         yield ['path' => '/somewherelese/', 'core' => 'corename', 'expectedCoreBasePath' => '/somewherelese'];
     }
 
-    /**
-     * @dataProvider coreBasePathDataProvider
-     * @test
-     */
+    #[DataProvider('coreBasePathDataProvider')]
+    #[Test]
     public function canGetCoreBasePath(string $path, string $core, string $expectedCoreBasePath): void
     {
         $readEndpoint = new Endpoint(
@@ -165,9 +168,7 @@ class SolrConnectionTest extends SetUpUnitTestCase
         self::assertSame($expectedCoreBasePath, $solrService->getReadService()->getPrimaryEndpoint()->getPath());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function coreBaseUriContainsAllSegments(): void
     {
         $readEndpoint = new Endpoint([

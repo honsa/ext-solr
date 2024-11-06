@@ -241,7 +241,7 @@ Example (boosts tt_news documents by factor 10):
 
 .. code-block:: typoscript
 
-    plugin.tx_solr.search.query.boostQuery.boostNews = (type:tt_news)^10
+    plugin.tx_solr.search.query.boostQuery.boostNews = type:tt_news^10
 
 
 query.tieParameter
@@ -622,10 +622,10 @@ lastSearches.mode
 :Type: String
 :TS Path: plugin.tx_solr.search.lastSearches.mode
 :Since: 1.3-dkd
-:Default: user
-:Options: user, global
+:Default: disabled
+:Options: user, global, disabled
 
-If mode is user, keywords will get stored into the session. If mode is global keywords will get stored into the database.
+If mode is user, keywords will get stored into the session. If mode is global keywords will get stored into the database. If mode is disabled, then keywords are not stored in the database.
 
 frequentSearches
 ----------------

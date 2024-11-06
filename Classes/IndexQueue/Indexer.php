@@ -41,6 +41,7 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Throwable;
 use TYPO3\CMS\Core\Context\LanguageAspectFactory;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -52,9 +53,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * records like news records, tt_address, and so on.
  * Specialized indexers can extend this class to handle advanced stuff like
  * category resolution in news records or file indexing.
- *
- * @author Ingo Renner <ingo@typo3.org>
- * @copyright  (c) 2009-2015 Ingo Renner <ingo@typo3.org>
  */
 class Indexer extends AbstractIndexer
 {
@@ -257,16 +255,16 @@ class Indexer extends AbstractIndexer
             return null;
         }
 
-        $pidToUse = $this->getPageIdOfItem($item);
+        $typo3site = $item->getSite()->getTypo3SiteObject();
+        $typo3siteLanguage = $typo3site->getLanguageById($language);
 
-        $globalTsfe = GeneralUtility::makeInstance(Tsfe::class);
-        $specializedTsfe = $globalTsfe->getTsfeByPageIdAndLanguageId($pidToUse, $language, $item->getRootPageUid());
-
-        if ($specializedTsfe === null) {
-            return null;
-        }
-
-        return $specializedTsfe->sys_page->getLanguageOverlay($item->getType(), $itemRecord);
+        /** @var PageRepository $pageRepository */
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
+        return $pageRepository->getLanguageOverlay(
+            $item->getType(),
+            $itemRecord,
+            LanguageAspectFactory::createFromSiteLanguage($typo3siteLanguage),
+        );
     }
 
     protected function isAFreeContentModeItemRecord(Item $item): bool
@@ -383,7 +381,13 @@ class Indexer extends AbstractIndexer
             $itemIndexingConfiguration = $this->getItemTypeConfiguration($item, $language);
             $document = $this->getBaseDocument($item, $itemRecord);
             $tsfe = $this->getTsfeByItemAndLanguageId($item, $language);
-            $document = $this->addDocumentFieldsFromTyposcript($document, $itemIndexingConfiguration, $itemRecord, $tsfe);
+            $document = $this->addDocumentFieldsFromTyposcript(
+                $document,
+                $itemIndexingConfiguration,
+                $itemRecord,
+                $tsfe,
+                $language,
+            );
         }
 
         return $document;

@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Solr\Parser;
 
 use ApacheSolrForTypo3\Solr\System\Solr\Parser\StopWordParser;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for StopWordParser
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class StopWordParserTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canParseStopWords()
+    #[Test]
+    public function canParseStopWords(): void
     {
         $parser = new StopWordParser();
         $stopwords = $parser->parseJson(self::getFixtureContentByName('stopword.json'));

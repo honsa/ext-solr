@@ -19,19 +19,15 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\QueryGrou
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\QueryGroup\QueryGroupFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Unit test for the QueryGroupFacet options collection
- *
- * @author Timo Hund <timo.hund@dkd.de>
- * @author Frans Saris <frans@beech.it>
  */
 class OptionCollectionTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetManualSortedCopy()
+    #[Test]
+    public function canGetManualSortedCopy(): void
     {
         $searchResultSetMock = $this->createMock(SearchResultSet::class);
         $facet = new QueryGroupFacet($searchResultSetMock, 'age', 'created');

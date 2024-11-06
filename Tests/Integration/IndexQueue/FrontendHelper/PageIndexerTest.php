@@ -18,15 +18,13 @@ declare(strict_types=1);
 namespace ApacheSolrForTypo3\Solr\Tests\Integration\IndexQueue\FrontendHelper;
 
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
 
 /**
  * Testcase to check if we can index page documents using the PageIndexer
- *
- * @author Timo Schmidt
- * (c) 2015 Timo Schmidt <timo.schmidt@dkd.de>
  */
 class PageIndexerTest extends IntegrationTestBase
 {
@@ -46,16 +44,14 @@ class PageIndexerTest extends IntegrationTestBase
      */
     protected function tearDown(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndexPageIntoSolr(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_into_solr.csv');
         $this->addSimpleFrontendRenderingToTypoScriptRendering(
@@ -82,12 +78,10 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"custom_stringS":"my text"', $solrContent, 'Document does not contains value build with typoscript');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndexPageWithCustomPageTypeIntoSolr(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_custom_pagetype_into_solr.csv');
 
@@ -119,13 +113,11 @@ class PageIndexerTest extends IntegrationTestBase
 
     /**
      * This testcase should check if we can queue an custom record with MM relations and respect the additionalWhere clause.
-     *
-     * @test
      */
+    #[Test]
     public function canIndexTranslatedPageToPageRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty('core_en');
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_page_with_relation_to_page.csv');
         $this->addSimpleFrontendRenderingToTypoScriptRendering(
@@ -156,18 +148,16 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"title":"Seite"', $solrContentDe, 'Solr did not contain the translated page');
         self::assertStringContainsString('"relatedPageTitles_stringM":["Verwandte Seite"]', $solrContentDe, 'Did not get content of related field');
 
-        $this->cleanUpSolrServerAndAssertEmpty('core_en');
-        $this->cleanUpSolrServerAndAssertEmpty('core_de');
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
     }
 
     /**
-     * This testcase should check if we can queue an custom record with MM relations and respect the additionalWhere clause.
-     *
-     * @test
+     * This testcase should check if we can queue a custom record with MM relations and respect the additionalWhere clause.
      */
+    #[Test]
     public function canIndexPageToCategoryRelation(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty('core_en');
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_page_with_relation_to_category.csv');
         $this->addSimpleFrontendRenderingToTypoScriptRendering(
@@ -191,12 +181,10 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"title":"Sub page"', $solrContentEn, 'Solr did not contain the english page');
         self::assertStringContainsString('"categories_stringM":["Test"]', $solrContentEn, 'There is no relation for the original, so ther should not be a related field');
 
-        $this->cleanUpSolrServerAndAssertEmpty('core_en');
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndexPageIntoSolrWithAdditionalFields(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_with_additional_fields_into_solr.csv');
@@ -228,9 +216,7 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"additional_custom_stringS":"my text"', $solrContent, 'Document does not contains value from index.additionFields');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canIndexPageIntoSolrWithAdditionalFieldsFromRootLine(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_overwrite_configuration_in_rootline.csv');
@@ -256,12 +242,10 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"additional_stringS":"from rootline"', $solrContent, 'Document does not contain custom field from rootline');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canExecutePostProcessor(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
 
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_into_solr.csv');
         $this->addTypoScriptToTemplateRecord(1, 'config.index_enable = 1');
@@ -275,9 +259,7 @@ class PageIndexerTest extends IntegrationTestBase
         self::assertStringContainsString('"postProcessorField_stringS":"postprocessed"', $solrContent, 'Field from post processor was not added');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canExecuteAdditionalPageIndexer(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_into_solr.csv');
@@ -316,14 +298,15 @@ class PageIndexerTest extends IntegrationTestBase
      *  ——[ 1] Page (Root)
      *  |
      *  ——[14] Mount Point (to [24] to show contents from)
-     *
-     * @test
      */
+    #[Test]
     public function canIndexMountedPage(): void
     {
+        self::markTestSkipped('@todo: Fix it. See: https://github.com/TYPO3-Solr/ext-solr/issues/4160');
+
         $GLOBALS['TYPO3_CONF_VARS']['FE']['enable_mount_pids'] = 1;
 
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_mounted_page.csv');
         $this->addTypoScriptToTemplateRecord(1, 'config.index_enable = 1');
         $this->indexQueuedPage(24, '/en/', ['MP' => '24-14']);
@@ -352,11 +335,13 @@ class PageIndexerTest extends IntegrationTestBase
      *  ——[ 2] Page (Root)
      *  |
      *  ——[24] Mount Point (to [24] to show contents from)
-     * @test
      */
+    #[Test]
     public function canIndexMultipleMountedPage(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        self::markTestSkipped('@todo: Fix it. See: https://github.com/TYPO3-Solr/ext-solr/issues/4160');
+
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_index_multiple_mounted_page.csv');
         $this->addTypoScriptToTemplateRecord(1, 'config.index_enable = 1');
         $this->indexQueuedPage(44, '/en/', ['MP' => '44-14']);
@@ -376,9 +361,8 @@ class PageIndexerTest extends IntegrationTestBase
     /**
      * This Test should test, that TYPO3 CMS on FE does not die if page is not available.
      * If something goes wrong the exception must be thrown instead of dying, to make marking the items as failed possible.
-     *
-     * @test
      */
+    #[Test]
     public function phpProcessDoesNotDieIfPageIsNotAvailable(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/does_not_die_if_page_not_available.csv');

@@ -21,14 +21,13 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ApacheSolrForTypo3\Solr\Task\ReIndexTask;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * TestCase to check if the index queue can be initialized by the ReIndex Task
- *
- * @author Timo Schmidt
  */
 class ReIndexTaskTest extends IntegrationTestBase
 {
@@ -86,10 +85,10 @@ class ReIndexTaskTest extends IntegrationTestBase
     }
 
     /**
-     * @test
      * @throws Exception
      */
-    public function testIfTheQueueIsFilledAfterTaskWasRunning()
+    #[Test]
+    public function testIfTheQueueIsFilledAfterTaskWasRunning(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_reindex_task_fill_queue.csv');
         $this->assertEmptyIndexQueue();
@@ -104,10 +103,10 @@ class ReIndexTaskTest extends IntegrationTestBase
     }
 
     /**
-     * @test
      * @throws Exception
      */
-    public function testCanGetAdditionalInformationFromTask()
+    #[Test]
+    public function testCanGetAdditionalInformationFromTask(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_reindex_task_fill_queue.csv');
         $this->assertEmptyIndexQueue();
@@ -123,10 +122,10 @@ class ReIndexTaskTest extends IntegrationTestBase
     }
 
     /**
-     * @test
      * @throws Exception
      */
-    public function solrIsEmptyAfterCleanup()
+    #[Test]
+    public function solrIsEmptyAfterCleanup(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/can_reindex_task_fill_queue.csv');
 
@@ -151,6 +150,6 @@ class ReIndexTaskTest extends IntegrationTestBase
         $this->assertSolrIsEmpty();
 
         // if not we cleanup now
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
     }
 }

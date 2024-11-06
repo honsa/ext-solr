@@ -7,13 +7,13 @@
   "homepage": "https://www.typo3-solr.com",
   "authors": [
     {
-      "name": "Ingo Renner",
-      "email": "ingo@typo3.org",
-      "role": "Lead Developer"
+      "name": "dkd Internet Service GmbH",
+      "email": "info@dkd.de",
+      "homepage": "https://www.dkd.de"
     }
   ],
   "support": {
-    "email": "solr-eb-support@dkd.de",
+    "email": "info@dkd.de",
     "issues": "https://github.com/TYPO3-Solr/ext-solr/issues",
     "forum": "https://talk.typo3.org",
     "slack": "https://typo3.slack.com/archives/C02FF05Q4",
@@ -21,29 +21,30 @@
     "docs": "https://docs.typo3.org/p/apache-solr-for-typo3/solr/main/en-us/"
   },
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "ext-dom": "*",
     "ext-json": "*",
     "ext-libxml": "*",
     "ext-pdo": "*",
     "ext-simplexml": "*",
-    "solarium/solarium": "6.3.2",
+    "solarium/solarium": "6.3.5",
     "typo3/cms-backend": "*",
-    "typo3/cms-core": "^v12.4.3",
+    "typo3/cms-core": "^v13.4",
     "typo3/cms-extbase": "*",
     "typo3/cms-fluid": "*",
     "typo3/cms-frontend": "*",
+    "typo3/cms-install": "*",
     "typo3/cms-reports": "*",
     "typo3/cms-scheduler": "*",
     "typo3/cms-tstemplate": "*"
   },
   "require-dev": {
     "dg/bypass-finals": "^1.6",
-    "phpunit/phpunit": "^10.1",
+    "phpunit/phpunit": "^11.4",
     "typo3/cms-fluid-styled-content": "*",
-    "typo3/coding-standards": "~0.7.1",
-    "typo3/testing-framework": "^8.0",
-    "phpstan/phpstan": "^1.10",
+    "typo3/coding-standards": "v0.8.0",
+    "typo3/testing-framework": "^9.0.1",
+    "phpstan/phpstan": "^1.11",
     "phpstan/phpstan-phpunit": "^1.3"
   },
   "replace": {
@@ -136,7 +137,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-main": "12.0.x-dev"
+      "dev-main": "13.0.x-dev"
     },
     "typo3/cms": {
       "extension-key": "solr",
@@ -144,18 +145,15 @@
     },
     "TYPO3-Solr": {
       "version-matrix": {
-        "ext-tika": "^12.0",
-        "ext-solrfal": "^12.0",
-        "ext-solrconsole": "^12.0",
-        "ext-solrdebugtools": "^12.0",
-        "ext-solrmlt": "^12.0",
+        "ext-tika": "^13.0",
+        "ext-solrfal": "^13.0",
+        "ext-solrconsole": "^13.0",
+        "ext-solrdebugtools": "^13.0",
+        "ext-solrmlt": "^13.0",
         "Apache-Solr": [
-          "9.5.0",
-          "9.4.1",
-          "9.4.0",
-          "9.3.0"
+          "9.7.0"
         ],
-        "configset": "ext_solr_12_0_0"
+        "configset": "ext_solr_13_0_0"
       },
       "ext-solrfal": {
       },

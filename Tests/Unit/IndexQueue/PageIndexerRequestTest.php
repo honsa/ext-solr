@@ -20,6 +20,7 @@ use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerRequest;
 use ApacheSolrForTypo3\Solr\System\Configuration\ExtensionConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -28,15 +29,11 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 
 /**
  * Index Queue Page Indexer request test.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexerRequestTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function authenticatesValidRequest()
+    #[Test]
+    public function authenticatesValidRequest(): void
     {
         $jsonEncodedParameters = json_encode([
             'item' => 1,
@@ -48,10 +45,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         self::assertTrue($request->isAuthenticated());
     }
 
-    /**
-     * @test
-     */
-    public function doesNotAuthenticateInvalidRequest()
+    #[Test]
+    public function doesNotAuthenticateInvalidRequest(): void
     {
         $jsonEncodedParameters = json_encode([
             'item' => 1,
@@ -63,10 +58,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         self::assertFalse($request->isAuthenticated());
     }
 
-    /**
-     * @test
-     */
-    public function usesUniqueIdFromHeader()
+    #[Test]
+    public function usesUniqueIdFromHeader(): void
     {
         $id = uniqid();
         $jsonEncodedParameters = json_encode([
@@ -77,10 +70,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         self::assertEquals($id, $request->getRequestId());
     }
 
-    /**
-     * @test
-     */
-    public function sendCreatesExpectedResponse()
+    #[Test]
+    public function sendCreatesExpectedResponse(): void
     {
         $testParameters = json_encode(['requestId' => '581f76be71f60']);
 
@@ -99,10 +90,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         self::assertSame($response->getRequestId(), '581f76be71f60', 'Response did not contain expected requestId');
     }
 
-    /**
-     * @test
-     */
-    public function sendThrowsExceptionOnIsMismatch()
+    #[Test]
+    public function sendThrowsExceptionOnIsMismatch(): void
     {
         $testParameters = json_encode(['requestId' => 'wrongId']);
         $fakeResponse = self::getFixtureContentByName('fakeResponse.json');
@@ -118,10 +107,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         $requestMock->send('http://7.6.local.typo3.org/about/typo3/');
     }
 
-    /**
-     * @test
-     */
-    public function sendThrowsExceptionWhenInvalidJsonIsReturned()
+    #[Test]
+    public function sendThrowsExceptionWhenInvalidJsonIsReturned(): void
     {
         $testParameters = json_encode(['requestId' => 'wrongId']);
         $fakeResponse = 'invalidJsonString!!';
@@ -136,10 +123,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         $requestMock->send('http://7.6.local.typo3.org/about/typo3/');
     }
 
-    /**
-     * @test
-     */
-    public function canSetTimeOutFromPHPConfiguration()
+    #[Test]
+    public function canSetTimeOutFromPHPConfiguration(): void
     {
         $initialTimeout = ini_get('default_socket_timeout');
         ini_set('default_socket_timeout', 122);
@@ -149,10 +134,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         ini_set('default_socket_timeout', $initialTimeout);
     }
 
-    /**
-     * @test
-     */
-    public function canSendRequestToSslSite()
+    #[Test]
+    public function canSendRequestToSslSite(): void
     {
         $testParameters = json_encode(['requestId' => '581f76be71f60']);
         $fakeResponse = self::getFixtureContentByName('fakeResponse.json');
@@ -165,10 +148,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         $requestMock->send('https://7.6.local.typo3.org/about/typo3/');
     }
 
-    /**
-     * @test
-     */
-    public function authenticationHeaderIsSetWhenUsernameAndPasswordHaveBeenPassed()
+    #[Test]
+    public function authenticationHeaderIsSetWhenUsernameAndPasswordHaveBeenPassed(): void
     {
         /** @var MockObject|RequestFactory $requestFactoryMock */
         $requestFactoryMock = $this->createMock(RequestFactory::class);
@@ -195,10 +176,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         $pageIndexerRequest->send('https://7.6.local.typo3.org/about/typo3/');
     }
 
-    /**
-     * @test
-     */
-    public function canSetParameter()
+    #[Test]
+    public function canSetParameter(): void
     {
         $pageIndexerRequest = $this->getPageIndexerRequest();
         self::assertNull($pageIndexerRequest->getParameter('foo'), 'Parameter foo should be null when nothing was set');
@@ -210,10 +189,8 @@ class PageIndexerRequestTest extends SetUpUnitTestCase
         self::assertSame(4711, $pageIndexerRequest->getParameter('test'), 'Could not get parameter foo after setting it');
     }
 
-    /**
-     * @test
-     */
-    public function canSetUserAgent()
+    #[Test]
+    public function canSetUserAgent(): void
     {
         $pageIndexerRequest = $this->getPageIndexerRequest();
 

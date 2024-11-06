@@ -23,8 +23,6 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 
 /**
  * Calculates the SearchQueryStatistics
- *
- * @author Thomas Hohn <tho@systime.dk>
  */
 class StatisticsRepository extends AbstractRepository
 {
@@ -54,13 +52,19 @@ class StatisticsRepository extends AbstractRepository
     {
         $countRows = $this->countByRootPageId($rootPageId);
         $queryBuilder = $this->getQueryBuilder();
-        return $queryBuilder
-            ->select('keywords')
-            ->add('select', $queryBuilder->expr()->count('keywords', 'count'), true)
-            ->add('select', $queryBuilder->expr()->avg('num_found', 'hits'), true)
-            ->add('select', '(' . $queryBuilder->expr()->count('keywords') . ' * 100 / ' . $countRows . ') AS percent', true)
+        $queryBuilder
+            ->select('keywords');
+
+        $queryBuilder->getConcreteQueryBuilder()
+            ->addSelect(
+                $queryBuilder->expr()->count('keywords', 'count'),
+                $queryBuilder->expr()->avg('num_found', 'hits'),
+                '(' . $queryBuilder->expr()->count('keywords') . ' * 100 / ' . $countRows . ') AS percent'
+            );
+
+        $queryBuilder
             ->from($this->table)
-            ->andWhere(
+            ->where(
                 $queryBuilder->expr()->gt('tstamp', $timeStart),
                 $queryBuilder->expr()->eq('root_pid', $rootPageId)
             )
@@ -69,6 +73,7 @@ class StatisticsRepository extends AbstractRepository
             ->addOrderBy('hits', 'DESC')
             ->addOrderBy('keywords', 'ASC')
             ->setMaxResults($limit);
+        return $queryBuilder;
     }
 
     /**
@@ -151,15 +156,20 @@ class StatisticsRepository extends AbstractRepository
     public function getFrequentSearchTermsFromStatisticsByFrequentSearchConfiguration(array $frequentSearchConfiguration): array
     {
         $queryBuilder = $this->getQueryBuilder();
-        return $queryBuilder
+        $queryBuilder
             ->addSelectLiteral(
                 $frequentSearchConfiguration['select.']['SELECT']
             )
-            ->from($frequentSearchConfiguration['select.']['FROM'])
-            ->add('where', $frequentSearchConfiguration['select.']['ADD_WHERE'], true)
-            ->add('groupBy', $frequentSearchConfiguration['select.']['GROUP_BY'], true)
-            ->add('orderBy', $frequentSearchConfiguration['select.']['ORDER_BY'])
-            ->setMaxResults((int)$frequentSearchConfiguration['limit'])
+            ->from($frequentSearchConfiguration['select.']['FROM']);
+
+        $queryBuilder
+            ->getConcreteQueryBuilder()
+            ->where($frequentSearchConfiguration['select.']['ADD_WHERE'])
+            ->groupBy($frequentSearchConfiguration['select.']['GROUP_BY'])
+            ->orderBy($frequentSearchConfiguration['select.']['ORDER_BY'])
+            ->setMaxResults((int)$frequentSearchConfiguration['limit']);
+
+        return $queryBuilder
             ->executeQuery()
             ->fetchAllAssociative();
     }

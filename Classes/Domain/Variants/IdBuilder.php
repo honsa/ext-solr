@@ -22,6 +22,7 @@ use ApacheSolrForTypo3\Solr\Event\Variants\AfterVariantIdWasBuiltEvent;
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\CMS\Core\Crypto\HashService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -31,7 +32,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * <SystemHash>/type/uid
  *
  * A file from one system will get the same variantId, which could be useful for de-duplication.
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class IdBuilder
 {
@@ -62,6 +62,6 @@ class IdBuilder
 
         $siteName = $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'];
         $systemKey = 'tx_solr' . $siteName;
-        return GeneralUtility::hmac($systemKey);
+        return GeneralUtility::makeInstance(HashService::class)->hmac($systemKey, $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'] ?? '');
     }
 }

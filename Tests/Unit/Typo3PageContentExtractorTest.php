@@ -17,20 +17,18 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit;
 
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Typo3PageContentExtractor;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use Traversable;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Tests the TYPO3 page content extractor
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class Typo3PageContentExtractorTest extends SetUpUnitTestCase
 {
-    /**
-     * @var TypoScriptConfiguration
-     */
-    protected $typoScripConfigurationMock;
+    protected TypoScriptConfiguration|MockObject $typoScripConfigurationMock;
 
     protected function setUp(): void
     {
@@ -41,10 +39,8 @@ class Typo3PageContentExtractorTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function changesNbspToSpace()
+    #[Test]
+    public function changesNbspToSpace(): void
     {
         $content = '<!-- TYPO3SEARCH_begin -->In Olten&nbsp;ist<!-- TYPO3SEARCH_end -->';
         $expectedResult = 'In Olten ist';
@@ -55,10 +51,8 @@ class Typo3PageContentExtractorTest extends SetUpUnitTestCase
         self::assertEquals($expectedResult, $actualResult);
     }
 
-    /**
-     * @test
-     */
-    public function canExcludeContentByClass()
+    #[Test]
+    public function canExcludeContentByClass(): void
     {
         $content = '<!-- TYPO3SEARCH_begin --><div class="typo3-search-exclude">Exclude content</div><p>Expected content</p><!-- TYPO3SEARCH_end -->';
         $expectedResult = '<!-- TYPO3SEARCH_begin --><p>Expected content</p><!-- TYPO3SEARCH_end -->';
@@ -70,10 +64,8 @@ class Typo3PageContentExtractorTest extends SetUpUnitTestCase
         self::assertEquals($expectedResult, $actualResult);
     }
 
-    /**
-     * @test
-     */
-    public function excludeContentKeepsEncodingForUmlaut()
+    #[Test]
+    public function excludeContentKeepsEncodingForUmlaut(): void
     {
         $content = '<!-- TYPO3SEARCH_begin --><div class="typo3-search-exclude">Remove me</div><p>Was ein schöner Tag</p><!-- TYPO3SEARCH_end -->';
 
@@ -86,10 +78,8 @@ class Typo3PageContentExtractorTest extends SetUpUnitTestCase
         self::assertStringNotContainsString('Remove me', $actualResult);
     }
 
-    /**
-     * @test
-     */
-    public function excludeContentKeepsEncodingForEuroSign()
+    #[Test]
+    public function excludeContentKeepsEncodingForEuroSign(): void
     {
         $content = '<!-- TYPO3SEARCH_begin --><div class="typo3-search-exclude">Remove me</div><p>100€</p><!-- TYPO3SEARCH_end -->';
 
@@ -138,10 +128,8 @@ class Typo3PageContentExtractorTest extends SetUpUnitTestCase
         ];
     }
 
-    /**
-     * @dataProvider canGetIndexableContentDataProvider
-     * @test
-     */
+    #[DataProvider('canGetIndexableContentDataProvider')]
+    #[Test]
     public function canGetIndexableContent($content, $expectedResult): void
     {
         $content = '<!-- TYPO3SEARCH_begin -->' . $content . '<!-- TYPO3SEARCH_end -->';

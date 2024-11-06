@@ -18,21 +18,19 @@ declare(strict_types=1);
 namespace ApacheSolrForTypo3\Solr\ViewHelpers;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\FrequentSearches\FrequentSearchesService;
+use ApacheSolrForTypo3\Solr\Exception as SolrException;
 use ApacheSolrForTypo3\Solr\System\Configuration\ConfigurationManager;
-use Closure;
 use Doctrine\DBAL\Exception as DBALException;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException as AspectNotFoundExceptionAlias;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 
 /**
  * Class LastSearchesViewHelper
  *
- * @author Rudy Gnodde <rudy.gnodde@beech.it>
  *
  * @noinspection PhpUnused
  */
@@ -53,11 +51,10 @@ class FrequentlySearchedViewHelper extends AbstractSolrViewHelper
      *
      * @throws AspectNotFoundExceptionAlias
      * @throws DBALException
+     * @throws SolrException
      */
-    public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public function render()
     {
-        /** @var TypoScriptFrontendController $tsfe */
-        $tsfe = $GLOBALS['TSFE'];
         $cache = self::getInitializedCache();
         /** @var ConfigurationManager $configurationManager */
         $configurationManager = GeneralUtility::makeInstance(ConfigurationManager::class);
@@ -67,16 +64,22 @@ class FrequentlySearchedViewHelper extends AbstractSolrViewHelper
             FrequentSearchesService::class,
             $typoScriptConfiguration,
             $cache,
-            $tsfe
         );
 
-        $frequentSearches = $frequentSearchesService->getFrequentSearchTerms();
+        if (!$this->renderingContext instanceof RenderingContext) {
+            throw new SolrException(
+                'Solr rendering context must be an instance of RenderingContext',
+                1717760054,
+            );
+        }
+
+        $frequentSearches = $frequentSearchesService->getFrequentSearchTerms($this->renderingContext->getRequest());
         $minimumSize = $typoScriptConfiguration->getSearchFrequentSearchesMinSize();
         $maximumSize = $typoScriptConfiguration->getSearchFrequentSearchesMaxSize();
 
-        $templateVariableContainer = $renderingContext->getVariableProvider();
+        $templateVariableContainer = $this->renderingContext->getVariableProvider();
         $templateVariableContainer->add('frequentSearches', self::enrichFrequentSearchesInfo($frequentSearches, $minimumSize, $maximumSize));
-        $output = $renderChildrenClosure();
+        $output = $this->renderChildren();
         $templateVariableContainer->remove('frequentSearches');
         return $output;
     }
@@ -88,8 +91,9 @@ class FrequentlySearchedViewHelper extends AbstractSolrViewHelper
     {
         $cacheIdentifier = 'tx_solr';
         try {
-            /** @var FrontendInterface $cacheInstance */
-            $cacheInstance = GeneralUtility::makeInstance(CacheManager::class)->getCache($cacheIdentifier);
+            /** @var CacheManager $cacheManager */
+            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+            $cacheInstance = $cacheManager->getCache($cacheIdentifier);
         } catch (NoSuchCacheException) {
             return null;
         }

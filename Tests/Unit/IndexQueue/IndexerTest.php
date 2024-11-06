@@ -32,10 +32,12 @@ use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Solr\Service\SolrWriteService;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use Closure;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use ReflectionClass;
-use TYPO3\CMS\Core\Tests\Unit\Fixtures\EventDispatcher\MockEventDispatcher;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -54,10 +56,9 @@ class IndexerTest extends SetUpUnitTestCase
     /**
      * @param int $httpStatus
      * @param bool $itemIndexed
-     *
-     * @test
-     * @dataProvider canTriggerIndexingAndIndicateIndexStatusDataProvider
      */
+    #[DataProvider('canTriggerIndexingAndIndicateIndexStatusDataProvider')]
+    #[Test]
     public function canTriggerIndexingAndIndicateIndexStatus(int $httpStatus, bool $itemIndexed): void
     {
         $writeServiceMock = $this->createMock(SolrWriteService::class);
@@ -142,11 +143,9 @@ class IndexerTest extends SetUpUnitTestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider canGetAdditionalDocumentsDataProvider
-     */
-    public function canGetAdditionalDocuments(\Closure|null $listener, ?string $expectedException, int $expectedResultCount): void
+    #[DataProvider('canGetAdditionalDocumentsDataProvider')]
+    #[Test]
+    public function canGetAdditionalDocuments(Closure|null $listener, ?string $expectedException, int $expectedResultCount): void
     {
         $indexer = $this->getAccessibleMock(
             Indexer::class,
@@ -165,10 +164,19 @@ class IndexerTest extends SetUpUnitTestCase
                 $this->createMock(TypoScriptFrontendController::class)
             );
 
-        $eventDispatcher = new MockEventDispatcher();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         if ($listener) {
-            $eventDispatcher->addListener($listener);
+            $eventDispatcher->expects(self::once())->method('dispatch')->willReturnCallback($listener);
+        } else {
+            // @todo: it is really needed to test the EventDispatcher-Stack of libs there?
+            // If not, remove this else block and 'no listener registered' from canGetAdditionalDocumentsDataProvider.
+            $eventDispatcher->expects(self::once())->method('dispatch')->willReturnCallback(
+                static function (object $event) {
+                    return $event;
+                }
+            );
         }
+
         $indexer->_set('eventDispatcher', $eventDispatcher);
 
         if ($expectedException !== null) {
@@ -207,31 +215,32 @@ class IndexerTest extends SetUpUnitTestCase
     public static function canGetAdditionalDocumentsDataProvider(): Generator
     {
         yield 'no listener registered' => [
-            null,
-            null,
-            1,
+            'listener' => null,
+            'expectedException' => null,
+            'expectedResultCount' => 1,
         ];
 
         yield 'valid listener, no additional documents' => [
-            function (BeforeDocumentIsProcessedForIndexingEvent $event) {
-                // Does nothing
+            'listener' => static function (BeforeDocumentIsProcessedForIndexingEvent $event) {
+                return $event;
             },
-            null,
-            1,
+            'expectedException' => null,
+            'expectedResultCount' => 1,
         ];
         yield 'valid listener, adds an additional document' => [
-            function (BeforeDocumentIsProcessedForIndexingEvent $event) {
+            'listener' => static function (BeforeDocumentIsProcessedForIndexingEvent $event) {
                 $event->addDocuments([new Document()]);
+                return $event;
             },
-            null,
-            2,
+            'expectedException' => null,
+            'expectedResultCount' => 2,
         ];
     }
 
     /**
-     * @test
      * @skip
      */
+    #[Test]
     public function indexerAlwaysInitializesTSFE(): void
     {
         self::markTestIncomplete('API has been changed, the test case must be moved, since it is still relevant.');

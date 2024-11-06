@@ -15,28 +15,20 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace  ApacheSolrForTypo3\Solr\Tests\Unit\System\ContentObject;
+namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\ContentObject;
 
 use ApacheSolrForTypo3\Solr\System\ContentObject\ContentObjectService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Testcase for ContentObjectService
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class ContentObjectServiceTest extends SetUpUnitTestCase
 {
-    /**
-     * @var ContentObjectRenderer|MockObject
-     */
-    protected $contentObjectRendererMock;
-
-    /**
-     * @var ContentObjectService
-     */
+    protected ContentObjectRenderer|MockObject $contentObjectRendererMock;
     protected ContentObjectService $contentObjectService;
 
     protected function setUp(): void
@@ -48,10 +40,8 @@ class ContentObjectServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canRenderSingleContentObjectByArrayAndKey()
+    #[Test]
+    public function canRenderSingleContentObjectByArrayAndKey(): void
     {
         $fakeStdWrapConfiguration = [
             'field' => 'TEXT',
@@ -66,10 +56,8 @@ class ContentObjectServiceTest extends SetUpUnitTestCase
         $this->contentObjectService->renderSingleContentObjectByArrayAndKey($fakeStdWrapConfiguration, 'field');
     }
 
-    /**
-     * @test
-     */
-    public function renderSingleContentObjectByArrayAndKeyWillReturnNameWhenConfigIsNotAnArray()
+    #[Test]
+    public function renderSingleContentObjectByArrayAndKeyWillReturnNameWhenConfigIsNotAnArray(): void
     {
         $fakeStdWrapConfiguration = [
             'field' => 'fooo',

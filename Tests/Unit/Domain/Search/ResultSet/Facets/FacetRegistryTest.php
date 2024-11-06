@@ -20,13 +20,11 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\O
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\TestPackage\TestPackage;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Testcases for the Facet parser registry
- *
- * @author Frans Saris <frans@beech.it>
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class FacetRegistryTest extends SetUpUnitTestCase
 {
@@ -48,9 +46,7 @@ class FacetRegistryTest extends SetUpUnitTestCase
         return $facetRegistry;
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function registeredPackageClassCanBeRetrievedByType(): void
     {
         $facetType = 'myType';
@@ -63,9 +59,7 @@ class FacetRegistryTest extends SetUpUnitTestCase
         self::assertEquals($packageObject, $facetRegistry->getPackage($facetType));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function registerParserClassThrowsExceptionIfClassDoesNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -74,9 +68,7 @@ class FacetRegistryTest extends SetUpUnitTestCase
         $facetParserRegistry->registerPackage($this->getUniqueId(), 'unknown');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function registerParserClassThrowsExceptionIfClassDoesNotImplementFacetPackageInterface(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -86,9 +78,7 @@ class FacetRegistryTest extends SetUpUnitTestCase
         $facetParserRegistry->registerPackage($className, 'unknown');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function registerReturnsDefaultPackageForUnknownFacetType(): void
     {
         $optionsFacetPackage = new OptionsPackage();
@@ -96,9 +86,7 @@ class FacetRegistryTest extends SetUpUnitTestCase
         self::assertEquals($optionsFacetPackage, $facetParserRegistry->getPackage('unknownType'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canRegisterDifferentDefaultPackage(): void
     {
         $packageObject = new TestPackage();

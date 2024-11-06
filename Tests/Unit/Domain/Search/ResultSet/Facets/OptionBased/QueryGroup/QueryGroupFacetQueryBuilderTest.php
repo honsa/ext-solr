@@ -18,18 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Opti
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\QueryGroup\QueryGroupFacetQueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the dateRange queryBuilder
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class QueryGroupFacetQueryBuilderTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canBuildQueryGroupFacetWithKeepAllOptionsOnSelection()
+    #[Test]
+    public function canBuildQueryGroupFacetWithKeepAllOptionsOnSelection(): void
     {
         /**
          * queryGroup {
@@ -68,10 +65,8 @@ class QueryGroupFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuildQueryGroupFacetWithKeepAllFacetsOnSelection()
+    #[Test]
+    public function canBuildQueryGroupFacetWithKeepAllFacetsOnSelection(): void
     {
         /**
          * faceting {
@@ -120,10 +115,8 @@ class QueryGroupFacetQueryBuilderTest extends SetUpUnitTestCase
         self::assertSame($expectedFacetParameters, $facetParameters, 'Can not build facet parameters as expected');
     }
 
-    /**
-     * @test
-     */
-    public function canBuild()
+    #[Test]
+    public function canBuild(): void
     {
         /**
          * queryGroup {

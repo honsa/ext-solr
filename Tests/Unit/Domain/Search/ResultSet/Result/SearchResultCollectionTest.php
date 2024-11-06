@@ -19,18 +19,14 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\Group;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Grouping\GroupCollection;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Result\SearchResultCollection;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Unit test case for the SearchResultCollection.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SearchResultCollectionTest extends SetUpUnitTestCase
 {
-    /**
-     * @var SearchResultCollection
-     */
-    protected $searchResultCollection;
+    protected SearchResultCollection $searchResultCollection;
 
     protected function setUp(): void
     {
@@ -38,28 +34,22 @@ class SearchResultCollectionTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function getHasGroupsReturnsFalseByDefault()
+    #[Test]
+    public function getHasGroupsReturnsFalseByDefault(): void
     {
         self::assertFalse($this->searchResultCollection->getHasGroups());
     }
 
-    /**
-     * @test
-     */
-    public function getHasGroupsReturnsTrueWhenGroupsExist()
+    #[Test]
+    public function getHasGroupsReturnsTrueWhenGroupsExist(): void
     {
         $groupA = new Group('foo');
         $this->searchResultCollection->getGroups()->add($groupA);
         self::assertTrue($this->searchResultCollection->getHasGroups());
     }
 
-    /**
-     * @test
-     */
-    public function canSetAndGetGroupCollection()
+    #[Test]
+    public function canSetAndGetGroupCollection(): void
     {
         $groupCollection = new GroupCollection();
         $this->searchResultCollection->setGroups($groupCollection);

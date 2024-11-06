@@ -20,19 +20,25 @@ namespace ApacheSolrForTypo3\Solr\IndexQueue;
 use ApacheSolrForTypo3\Solr\ContentObject\Classification;
 use ApacheSolrForTypo3\Solr\ContentObject\Multivalue;
 use ApacheSolrForTypo3\Solr\ContentObject\Relation;
+use ApacheSolrForTypo3\Solr\FrontendEnvironment\Exception\Exception as FrontendEnvironmentException;
+use ApacheSolrForTypo3\Solr\FrontendEnvironment\Tsfe;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
+use ApacheSolrForTypo3\Solr\System\Util\ArrayAccessor;
+use Doctrine\DBAL\Exception as DBALException;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\TypoScript\FrontendTypoScript;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\ContentObject\Exception\ContentRenderingException;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use UnexpectedValueException;
 
 /**
  * An abstract indexer class to collect a few common methods shared with other
  * indexers.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 abstract class AbstractIndexer
 {
@@ -59,8 +65,13 @@ abstract class AbstractIndexer
      * @param array $data Record data
      * @return Document Modified document with added fields
      */
-    protected function addDocumentFieldsFromTyposcript(Document $document, array $indexingConfiguration, array $data, TypoScriptFrontendController $tsfe): Document
-    {
+    protected function addDocumentFieldsFromTyposcript(
+        Document $document,
+        array $indexingConfiguration,
+        array $data,
+        TypoScriptFrontendController $tsfe,
+        int|SiteLanguage $language,
+    ): Document {
         $data = static::addVirtualContentFieldToRecord($document, $data);
 
         // mapping of record fields => solr document fields, resolving cObj
@@ -77,7 +88,13 @@ abstract class AbstractIndexer
                 );
             }
 
-            $fieldValue = $this->resolveFieldValue($indexingConfiguration, $solrFieldName, $data, $tsfe);
+            $fieldValue = $this->resolveFieldValue(
+                $indexingConfiguration,
+                $solrFieldName,
+                $data,
+                $tsfe,
+                $language,
+            );
             if ($fieldValue === null
                 || $fieldValue === ''
                 || (is_array($fieldValue) && empty($fieldValue))
@@ -114,13 +131,23 @@ abstract class AbstractIndexer
      * @param array $indexingConfiguration Indexing configuration as defined in plugin.tx_solr_index.queue.[indexingConfigurationName].fields
      * @param string $solrFieldName A Solr field name that is configured in the indexing configuration
      * @param array $data A record or item's data
+     * @param TypoScriptFrontendController $tsfe
+     * @param int|SiteLanguage $language The language to use in TSFE stack
+     *
      * @return array|float|int|string|null The resolved string value to be indexed; null if value could not be resolved
+     *
+     *
+     * @throws FrontendEnvironmentException
+     * @throws DBALException
+     * @throws SiteNotFoundException
+     * @throws ContentRenderingException
      */
     protected function resolveFieldValue(
         array $indexingConfiguration,
         string $solrFieldName,
         array $data,
-        TypoScriptFrontendController $tsfe
+        TypoScriptFrontendController $tsfe,
+        int|SiteLanguage $language,
     ): mixed {
         if (isset($indexingConfiguration[$solrFieldName . '.'])) {
             // configuration found => need to resolve a cObj
@@ -130,8 +157,15 @@ abstract class AbstractIndexer
             $backupWorkingDirectory = getcwd();
             chdir(Environment::getPublicPath() . '/');
 
-            $tsfe->cObj->start($data, $this->type);
-            $fieldValue = $tsfe->cObj->cObjGetSingle(
+            $cObject = GeneralUtility::makeInstance(ContentObjectRenderer::class, $tsfe);
+            $request = $GLOBALS['TYPO3_REQUEST'] ?? GeneralUtility::makeInstance(Tsfe::class)
+                ->getServerRequestForTsfeByPageIdAndLanguageId(
+                    $tsfe->id,
+                    $language instanceof SiteLanguage ? $language->getLanguageId() : $language
+                );
+            $cObject->setRequest($request);
+            $cObject->start($data, $this->type);
+            $fieldValue = $cObject->cObjGetSingle(
                 $indexingConfiguration[$solrFieldName],
                 $indexingConfiguration[$solrFieldName . '.']
             );
@@ -152,17 +186,28 @@ abstract class AbstractIndexer
                 $indexingConfiguration[$solrFieldName],
                 1
             ));
-            $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
+
+            /** @var ?FrontendTypoScript $frontendTypoScript */
+            $frontendTypoScript = $tsfe->cObj->getRequest()->getAttribute('frontend.typoscript');
+            $configurationAccess = new ArrayAccessor($frontendTypoScript?->getSetupArray(), '.', true);
             // $name and $conf is loaded with the referenced values.
-            [$name, $conf] = $typoScriptParser->getVal($referencedTsPath, $GLOBALS['TSFE']->tmpl->setup);
+            $name = $configurationAccess->get($referencedTsPath);
+            $conf = $configurationAccess->get($referencedTsPath . '.');
 
             // need to change directory to make IMAGE content objects work in BE context
             // see http://blog.netzelf.de/lang/de/tipps-und-tricks/tslib_cobj-image-im-backend
             $backupWorkingDirectory = getcwd();
             chdir(Environment::getPublicPath() . '/');
 
-            $tsfe->cObj->start($data, $this->type);
-            $fieldValue = $tsfe->cObj->cObjGetSingle($name, $conf);
+            $cObject = GeneralUtility::makeInstance(ContentObjectRenderer::class, $tsfe);
+            $request = $GLOBALS['TYPO3_REQUEST'] ?? GeneralUtility::makeInstance(Tsfe::class)
+                ->getServerRequestForTsfeByPageIdAndLanguageId(
+                    $tsfe->id,
+                    $language instanceof SiteLanguage ? $language->getLanguageId() : $language
+                );
+            $cObject->setRequest($request);
+            $cObject->start($data, $this->type);
+            $fieldValue = $cObject->cObjGetSingle($name, $conf);
 
             chdir($backupWorkingDirectory);
 

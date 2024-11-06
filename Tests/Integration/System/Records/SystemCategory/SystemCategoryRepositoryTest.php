@@ -17,19 +17,16 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\System\Records\SystemCategor
 
 use ApacheSolrForTypo3\Solr\System\Records\SystemCategory\SystemCategoryRepository;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Integration test for the SystemCategoryRepository
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SystemCategoryRepositoryTest extends IntegrationTestBase
 {
-    /**
-     * @test
-     */
-    public function canFindOneByParentCategory()
+    #[Test]
+    public function canFindOneByParentCategory(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/sys_category.csv');
 

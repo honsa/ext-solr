@@ -24,12 +24,10 @@ use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Solr\ResponseAdapter;
 use ApacheSolrForTypo3\Solr\System\Util\ArrayAccessor;
 use ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\SetUpFacetParser;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class QueryGroupFacetParserTest
- *
- * @author Timo Hund <timo.hund@dkd.de>
- * @author Frans Saris <frans@beech.it>
  */
 class QueryGroupFacetParserTest extends SetUpFacetParser
 {
@@ -69,10 +67,8 @@ class QueryGroupFacetParserTest extends SetUpFacetParser
         return $searchResultSet;
     }
 
-    /**
-     * @test
-     */
-    public function facetIsCreated()
+    #[Test]
+    public function facetIsCreated(): void
     {
         $facetConfiguration = [
             'age.' => [
@@ -99,10 +95,8 @@ class QueryGroupFacetParserTest extends SetUpFacetParser
         self::assertInstanceOf(QueryGroupFacet::class, $facet);
     }
 
-    /**
-     * @test
-     */
-    public function facetIsNotActive()
+    #[Test]
+    public function facetIsNotActive(): void
     {
         $facetConfiguration = [
             'age.' => [
@@ -130,10 +124,8 @@ class QueryGroupFacetParserTest extends SetUpFacetParser
         self::assertFalse($facet->getIsUsed());
     }
 
-    /**
-     * @test
-     */
-    public function facetIsActive()
+    #[Test]
+    public function facetIsActive(): void
     {
         $facetConfiguration = [
             'age.' => [
@@ -161,10 +153,8 @@ class QueryGroupFacetParserTest extends SetUpFacetParser
         self::assertTrue($facet->getIsUsed());
     }
 
-    /**
-     * @test
-     */
-    public function optionIsActive()
+    #[Test]
+    public function optionIsActive(): void
     {
         $facetConfiguration = [
             'age.' => [

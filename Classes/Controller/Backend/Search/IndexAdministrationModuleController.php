@@ -24,8 +24,6 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Index Administration Module
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class IndexAdministrationModuleController extends AbstractModuleController
 {
@@ -35,9 +33,9 @@ class IndexAdministrationModuleController extends AbstractModuleController
     public function indexAction(): ResponseInterface
     {
         if ($this->selectedSite === null || empty($this->solrConnectionManager->getConnectionsBySite($this->selectedSite))) {
-            $this->view->assign('can_not_proceed', true);
+            $this->moduleTemplate->assign('can_not_proceed', true);
         }
-        return $this->getModuleTemplateResponse();
+        return $this->moduleTemplate->renderResponse('Backend/Search/IndexAdministrationModule/Index');
     }
 
     /**

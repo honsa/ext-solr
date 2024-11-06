@@ -19,14 +19,13 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\O
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\OptionBased\Options\OptionsFacet;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\SearchResultSet;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Unit test for the OptionsFacet
- *
- * @author Timo Hund <timo.hund@dkd.de>
- * @author Frans Saris <frans@beech.it>
  */
 class OptionsFacetTest extends SetUpUnitTestCase
 {
@@ -36,20 +35,16 @@ class OptionsFacetTest extends SetUpUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function canGetTitleFromOptionsFacet()
+    #[Test]
+    public function canGetTitleFromOptionsFacet(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $optionsFacet = new OptionsFacet($resultSetMock, 'myFacet', 'myFacetFieldName', 'myTitle');
         self::assertSame('myTitle', $optionsFacet->getLabel(), 'Could not get title from options facet');
     }
 
-    /**
-     * @test
-     */
-    public function canAddOptionsToFacet()
+    #[Test]
+    public function canAddOptionsToFacet(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $optionsFacet = new OptionsFacet($resultSetMock, 'myFacet', 'myFacetFieldName', 'myTitle');
@@ -65,10 +60,8 @@ class OptionsFacetTest extends SetUpUnitTestCase
         self::assertEquals(1, $optionsFacet->getOptions()->getCount());
     }
 
-    /**
-     * @test
-     */
-    public function getDefaultPartialName()
+    #[Test]
+    public function getDefaultPartialName(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $queryGroupFacet = new OptionsFacet($resultSetMock, 'myFacet', 'myFacetFieldName', 'myTitle');
@@ -76,10 +69,8 @@ class OptionsFacetTest extends SetUpUnitTestCase
         self::assertEquals('Options', $queryGroupFacet->getPartialName());
     }
 
-    /**
-     * @test
-     */
-    public function getCustomPartialName()
+    #[Test]
+    public function getCustomPartialName(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $queryGroupFacet = new OptionsFacet($resultSetMock, 'myFacet', 'myFacetFieldName', 'myTitle', ['partialName' => 'MyPartial']);
@@ -87,10 +78,8 @@ class OptionsFacetTest extends SetUpUnitTestCase
         self::assertEquals('MyPartial', $queryGroupFacet->getPartialName());
     }
 
-    /**
-     * @test
-     */
-    public function getType()
+    #[Test]
+    public function getType(): void
     {
         $resultSetMock = $this->createMock(SearchResultSet::class);
         $myFacet = new OptionsFacet($resultSetMock, 'myFacet', 'myFacetFieldName', 'myTitle', ['partialName' => 'MyPartial']);
@@ -107,10 +96,8 @@ class OptionsFacetTest extends SetUpUnitTestCase
         yield '0' => ['0', false];
     }
 
-    /**
-     * @dataProvider getIncludeInAvailableFacetsDataProvider
-     * @test
-     */
+    #[DataProvider('getIncludeInAvailableFacetsDataProvider')]
+    #[Test]
     public function getIncludeInAvailableFacetsCastsSettingsToBoolProperly(
         null|int|string $includeInAvailableFacetsConfiguration,
         bool $expectedResult,

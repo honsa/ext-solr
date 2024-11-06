@@ -18,11 +18,10 @@ declare(strict_types=1);
 namespace ApacheSolrForTypo3\Solr\Tests\Unit\ContentObject;
 
 use ApacheSolrForTypo3\Solr\ContentObject\Multivalue;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Tests for the SOLR_MULTIVALUE cObj.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class MultivalueTest extends SetUpContentObject
 {
@@ -31,10 +30,8 @@ class MultivalueTest extends SetUpContentObject
         return Multivalue::class;
     }
 
-    /**
-     * @test
-     */
-    public function convertsCommaSeparatedListFromRecordToSerializedArrayOfTrimmedValues()
+    #[Test]
+    public function convertsCommaSeparatedListFromRecordToSerializedArrayOfTrimmedValues(): void
     {
         $list = 'abc, def, ghi, jkl, mno, pqr, stu, vwx, yz';
         $expected = 'a:9:{i:0;s:3:"abc";i:1;s:3:"def";i:2;s:3:"ghi";i:3;s:3:"jkl";i:4;s:3:"mno";i:5;s:3:"pqr";i:6;s:3:"stu";i:7;s:3:"vwx";i:8;s:2:"yz";}';
@@ -52,10 +49,8 @@ class MultivalueTest extends SetUpContentObject
         self::assertEquals($expected, $actual);
     }
 
-    /**
-     * @test
-     */
-    public function convertsCommaSeparatedListFromValueToSerializedArrayOfTrimmedValues()
+    #[Test]
+    public function convertsCommaSeparatedListFromValueToSerializedArrayOfTrimmedValues(): void
     {
         $list = 'abc, def, ghi, jkl, mno, pqr, stu, vwx, yz';
         $expected = 'a:9:{i:0;s:3:"abc";i:1;s:3:"def";i:2;s:3:"ghi";i:3;s:3:"jkl";i:4;s:3:"mno";i:5;s:3:"pqr";i:6;s:3:"stu";i:7;s:3:"vwx";i:8;s:2:"yz";}';

@@ -30,8 +30,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Index Queue Page Indexer request with details about which actions to perform.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexerRequest
 {
@@ -167,7 +165,8 @@ class PageIndexerRequest
         $headers = $this->getHeaders();
         $rawResponse = $this->getUrl($url, $headers, $this->timeout);
         // convert JSON response to response object properties
-        $decodedResponse = $response->getResultsFromJson($rawResponse->getBody()->getContents());
+        $responseString = $rawResponse->getBody()->getContents();
+        $decodedResponse = $response->getResultsFromJson($responseString);
 
         if ($decodedResponse === null) {
             $this->logger->error(
@@ -177,7 +176,7 @@ class PageIndexerRequest
                     'request url' => $url,
                     'request headers' => $headers,
                     'response headers' => $rawResponse->getHeaders(),
-                    'raw response body' => $rawResponse->getBody()->getContents(),
+                    'raw response body' => $responseString,
                 ]
             );
 
@@ -345,6 +344,7 @@ class PageIndexerRequest
         $options = [];
         try {
             $options = $this->buildGuzzleOptions($headers, $timeout);
+
             $response = $this->requestFactory->request($url, 'GET', $options);
         } catch (ClientException|ServerException $e) {
             $response = $e->getResponse();
@@ -366,7 +366,12 @@ class PageIndexerRequest
                     'options' => $options,
                 ]
             );
-        }
+        } /* @todo: fix that properly or remove */ /*finally {
+            if (isset($originalBackendUser)) {
+                $GLOBALS['BE_USER'] = $originalBackendUser;
+            }
+        }*/
+        $response->getBody()->rewind();
         return $response;
     }
 

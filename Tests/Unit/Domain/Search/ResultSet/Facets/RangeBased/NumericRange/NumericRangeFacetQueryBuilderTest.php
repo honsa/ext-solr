@@ -18,18 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Facets\Rang
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Facets\RangeBased\NumericRange\NumericRangeFacetQueryBuilder;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for the numericRange queryBuilder
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class NumericRangeFacetQueryBuilderTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canBuild()
+    #[Test]
+    public function canBuild(): void
     {
         $fakeFacetConfiguration = [
             'field' => 'price',

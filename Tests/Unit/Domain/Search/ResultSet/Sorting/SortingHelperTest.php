@@ -18,16 +18,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\ResultSet\Sorting;
 use ApacheSolrForTypo3\Solr\Domain\Search\ResultSet\Sorting\SortingHelper;
 use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class SortingHelperTest
  */
 class SortingHelperTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetSortFieldFromUrlParameter()
+    #[Test]
+    public function canGetSortFieldFromUrlParameter(): void
     {
         $sortConfiguration = [
             'relevance.' => ['field' => 'relevance', 'label' => 'Title'],
@@ -45,10 +44,8 @@ class SortingHelperTest extends SetUpUnitTestCase
         self::assertSame('sortTitle desc, type asc', $sortField);
     }
 
-    /**
-     * @test
-     */
-    public function canThrowExceptionForUnconfiguredSorting()
+    #[Test]
+    public function canThrowExceptionForUnconfiguredSorting(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No sorting configuration found for option name unconfigured');

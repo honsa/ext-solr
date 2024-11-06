@@ -27,12 +27,11 @@ use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use Doctrine\DBAL\Exception as DBALException;
 use stdClass;
 use Throwable;
+use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class to handle solr search requests
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class Search
 {
@@ -69,7 +68,10 @@ class Search
 
         if (is_null($solrConnection)) {
             $connectionManager = GeneralUtility::makeInstance(ConnectionManager::class);
-            $this->solr = $connectionManager->getConnectionByPageId(($GLOBALS['TSFE']->id ?? 0), ($GLOBALS['TSFE']?->getLanguage()->getLanguageId() ?? 0));
+            $language = $GLOBALS['TYPO3_REQUEST']->getAttribute('language');
+            $pageArguments = $GLOBALS['TYPO3_REQUEST']->getAttribute('routing');
+            $pageId = ($pageArguments instanceof PageArguments) ? $pageArguments->getPageId() : 0;
+            $this->solr = $connectionManager->getConnectionByPageId($pageId, $language?->getLanguageId() ?? 0);
         }
 
         $this->configuration = Util::getSolrConfiguration();

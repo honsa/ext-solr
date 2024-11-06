@@ -18,17 +18,14 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\IndexQueue;
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\QueueItemRepository;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Traversable;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class ItemTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canGetErrors()
+    #[Test]
+    public function canGetErrors(): void
     {
         $metaData = ['errors' => 'error during index'];
         $record = [];
@@ -38,10 +35,8 @@ class ItemTest extends SetUpUnitTestCase
         self::assertSame('error during index', $errors, 'Can not get errors from queue item');
     }
 
-    /**
-     * @test
-     */
-    public function canGetType()
+    #[Test]
+    public function canGetType(): void
     {
         $metaData = ['item_type' => 'pages'];
         $record = [];
@@ -58,20 +53,16 @@ class ItemTest extends SetUpUnitTestCase
         yield 'blocked item' => [['item_type' => 'pages', 'indexed' => 5, 'changed' => 4, 'errors' => 'Something bad happened'], Item::STATE_BLOCKED];
     }
 
-    /**
-     * @dataProvider getStateDataProvider
-     * @test
-     */
-    public function canGetState($metaData, $expectedState)
+    #[DataProvider('getStateDataProvider')]
+    #[Test]
+    public function canGetState($metaData, $expectedState): void
     {
         $item = new Item($metaData, [], null, $this->createMock(QueueItemRepository::class));
         self::assertSame($expectedState, $item->getState(), 'Can not get state from item as expected');
     }
 
-    /**
-     * @test
-     */
-    public function testHasErrors()
+    #[Test]
+    public function testHasErrors(): void
     {
         $item = new Item([], [], null, $this->createMock(QueueItemRepository::class));
         self::assertFalse($item->getHasErrors(), 'Expected that item without any data has no errors');
@@ -80,10 +71,8 @@ class ItemTest extends SetUpUnitTestCase
         self::assertTrue($item->getHasErrors(), 'Item with errors was not indicated to have errors');
     }
 
-    /**
-     * @test
-     */
-    public function testHasIndexingProperties()
+    #[Test]
+    public function testHasIndexingProperties(): void
     {
         $item = new Item([], [], null, $this->createMock(QueueItemRepository::class));
         self::assertFalse($item->hasIndexingProperties(), 'Expected that empty item should not have any indexing properties');

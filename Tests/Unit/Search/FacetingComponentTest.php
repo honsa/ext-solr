@@ -28,14 +28,13 @@ use ApacheSolrForTypo3\Solr\Search\FacetingComponent;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Solarium\QueryType\Select\RequestBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Tests the ApacheSolrForTypo3\Solr\Query\Modifier\Faceting class
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class FacetingComponentTest extends SetUpUnitTestCase
 {
@@ -79,9 +78,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *        field = type
      *     }
      *  }
-     *
-     * @test
      */
+    #[Test]
     public function testCanAddASimpleFacet(): void
     {
         $fakeConfigurationArray = [];
@@ -114,9 +112,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *        sortBy = index
      *     }
      *  }
-     *
-     * @test
      */
+    #[Test]
     public function testCanAddSortByIndexArgument(): void
     {
         $fakeConfigurationArray = [];
@@ -148,9 +145,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *        sortBy = count
      *     }
      *  }
-     *
-     * @test
      */
+    #[Test]
     public function testCanAddSortByCountArgument(): void
     {
         $fakeConfigurationArray = [];
@@ -189,9 +185,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *       }
      *    }
      * }
-     *
-     * @test
      */
+    #[Test]
     public function testCanHandleKeepAllFacetsOnSelectionOnAllFacetWhenGloballyConfigured(): void
     {
         $fakeConfigurationArray = [];
@@ -233,9 +228,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *       }
      *    }
      * }
-     *
-     * @test
      */
+    #[Test]
     public function testExcludeTagsAreEmptyWhenKeepAllFacetsOnSelectionIsNotSet(): void
     {
         $fakeConfigurationArray = [];
@@ -278,9 +272,8 @@ class FacetingComponentTest extends SetUpUnitTestCase
      *       }
      *    }
      * }
-     *
-     * @test
      */
+    #[Test]
     public function testCanHandleKeepAllOptionsOnSelectionForASingleFacet(): void
     {
         $fakeConfigurationArray = [];
@@ -308,9 +301,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('color', $jsonData->color->field, 'Query string did not contain expected snipped');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanHandleCombinationOfKeepAllFacetsOnSelectionAndKeepAllOptionsOnSelection(): void
     {
         $fakeConfigurationArray = [];
@@ -346,9 +337,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('color', $jsonData->color->field, 'Did not build json field properly');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanHandleCombinationOfKeepAllFacetsOnSelectionAndKeepAllOptionsOnSelectionAndCountAllFacetsForSelection(): void
     {
         $fakeConfigurationArray = [];
@@ -386,9 +375,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('color', $jsonData->color->field, 'Did not build json field properly');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanAddQueryFilters(): void
     {
         $fakeConfigurationArray = [];
@@ -419,9 +406,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('(type:"product")', $queryParameter['fq'][1], 'Did not build filter query from type');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanAddQueryFiltersWithKeepAllOptionsOnSelectionFacet(): void
     {
         $fakeConfigurationArray = [];
@@ -452,9 +437,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('{!tag=type}(type:"product")', $queryParameter['fq'][1], 'Did not build filter query from type');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanAddQueryFiltersWithGlobalKeepAllOptionsOnSelection(): void
     {
         $fakeConfigurationArray = [];
@@ -485,9 +468,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('{!tag=type}(type:"product")', $queryParameter['fq'][1], 'Did not build filter query from type');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanAddExcludeTagWithAdditionalExcludeTagConfiguration(): void
     {
         $fakeConfigurationArray = [];
@@ -519,9 +500,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('{!tag=type}(type:"product")', $queryParameter['fq'], 'Did not build filter query from color');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testCanAddQueryFiltersContainingPlusSign(): void
     {
         $fakeArguments = [
@@ -560,9 +539,7 @@ class FacetingComponentTest extends SetUpUnitTestCase
         self::assertEquals('{!tag=something2}(something2:"A B")', $queryParameter['fq'][2], 'Can handle %20 as space');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getFiltersByFacetNameCanHandleAssocUrlParameterStyle(): void
     {
         $facetingModifierStub = new class ($this->createMock(FacetRegistry::class)) extends FacetingComponent {

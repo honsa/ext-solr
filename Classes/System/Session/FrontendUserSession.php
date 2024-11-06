@@ -21,8 +21,6 @@ use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 /**
  * Encapsulates the access to the session of the frontend user.
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class FrontendUserSession
 {
@@ -33,7 +31,7 @@ class FrontendUserSession
      */
     public function __construct(FrontendUserAuthentication $feUser = null)
     {
-        $this->feUser = $feUser ?? $GLOBALS['TSFE']->fe_user;
+        $this->feUser = $feUser ?? $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.user');
     }
 
     public function setPerPage(int $requestedPerPage): void

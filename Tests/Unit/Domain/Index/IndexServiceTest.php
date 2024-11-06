@@ -25,12 +25,10 @@ use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
 
-/**
- * @author Timo Hund <timo.hund@dkd.de>
- */
 class IndexServiceTest extends SetUpUnitTestCase
 {
     protected Site|MockObject $siteMock;
@@ -52,9 +50,7 @@ class IndexServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function eventsAreTriggered(): void
     {
         $fakeConfiguration = $this->createMock(TypoScriptConfiguration::class);
@@ -81,9 +77,7 @@ class IndexServiceTest extends SetUpUnitTestCase
         $indexService->indexItems(2);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testConfigurationIsNotFetchedWhenProgressIsCalculated(): void
     {
         $this->siteMock->expects(self::never())->method('getSolrConfiguration');
@@ -101,9 +95,7 @@ class IndexServiceTest extends SetUpUnitTestCase
         self::assertEquals(50, $progress);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testServerHostIsRestoredInCaseOfAnException(): void
     {
         $fakeConfiguration = $this->createMock(TypoScriptConfiguration::class);
@@ -144,9 +136,7 @@ class IndexServiceTest extends SetUpUnitTestCase
         $indexService->indexItems(2);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function testDomainIsUsedFromSiteObject(): void
     {
         $fakeConfiguration = $this->createMock(TypoScriptConfiguration::class);

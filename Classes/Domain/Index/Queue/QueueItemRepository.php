@@ -25,7 +25,6 @@ use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\System\Records\AbstractRepository;
 use ApacheSolrForTypo3\Solr\System\Util\SiteUtility;
 use Doctrine\DBAL\Exception as DBALException;
-use PDO;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
@@ -242,7 +241,7 @@ class QueueItemRepository extends AbstractRepository
             ->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
         $pageContentLastChangedTime = $queryBuilder
-            ->add('select', $queryBuilder->expr()->max('tstamp', 'changed_time'))
+            ->selectLiteral($queryBuilder->expr()->max('tstamp', 'changed_time'))
             ->from('tt_content')
             ->where(
                 $queryBuilder->expr()->eq('pid', $pageUid)
@@ -270,7 +269,7 @@ class QueueItemRepository extends AbstractRepository
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($itemType);
             $queryBuilder->getRestrictions()->removeAll();
             $localizedChangedTime = $queryBuilder
-                ->add('select', $queryBuilder->expr()->max($timeStampField, 'changed_time'))
+                ->selectLiteral($queryBuilder->expr()->max($timeStampField, 'changed_time'))
                 ->from($itemType)
                 ->orWhere(
                     $queryBuilder->expr()->eq('uid', $itemUid),
@@ -552,7 +551,7 @@ class QueueItemRepository extends AbstractRepository
     {
         $queryBuilder = $this->getQueryBuilder();
         $compositeExpression = $queryBuilder->expr()->and(
-            $queryBuilder->expr()->eq('item_type', $queryBuilder->getConnection()->quote($itemType, PDO::PARAM_STR)),
+            $queryBuilder->expr()->eq('item_type', $queryBuilder->getConnection()->quote($itemType)),
             $queryBuilder->expr()->eq('item_uid', $itemUid)
         );
         return $this->getItemsByCompositeExpression($compositeExpression, $queryBuilder);
@@ -616,7 +615,7 @@ class QueueItemRepository extends AbstractRepository
         $indexQueueItemRecords = $queryBuilder
             ->select('*')
             ->from($this->table)
-            ->andWhere(
+            ->where(
                 $queryBuilder->expr()->eq('root', $site->getRootPageId()),
                 $queryBuilder->expr()->gt('changed', 'indexed'),
                 $queryBuilder->expr()->lte('changed', time()),
@@ -815,7 +814,7 @@ class QueueItemRepository extends AbstractRepository
         $queryBuilder = $this->getQueryBuilder();
         $resultSet = $queryBuilder
             ->select('item_uid')
-            ->add('select', $queryBuilder->expr()->count('*', 'queueItemCount'), true)
+            ->addSelectLiteral($queryBuilder->expr()->count('*', 'queueItemCount'))
             ->from($this->table)
             ->where(
                 $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter('pages')),
@@ -849,10 +848,10 @@ class QueueItemRepository extends AbstractRepository
             ->select('*')
             ->from($this->table)
             ->where(
-                $queryBuilder->expr()->eq('root', $queryBuilder->createNamedParameter($rootPid, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('root', $queryBuilder->createNamedParameter($rootPid, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $queryBuilder->expr()->eq('item_type', $queryBuilder->createNamedParameter('pages')),
                 $queryBuilder->expr()->in('item_uid', $mountedPids),
-                $queryBuilder->expr()->eq('has_indexing_properties', $queryBuilder->createNamedParameter(1, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('has_indexing_properties', $queryBuilder->createNamedParameter(1, \Doctrine\DBAL\ParameterType::INTEGER)),
                 $queryBuilder->expr()->eq('pages_mountidentifier', $queryBuilder->createNamedParameter($mountPointIdentifier))
             )
             ->executeQuery()
@@ -868,11 +867,11 @@ class QueueItemRepository extends AbstractRepository
         return $queryBuilder
             ->update($this->table)
             ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($itemUid, PDO::PARAM_INT))
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($itemUid, \Doctrine\DBAL\ParameterType::INTEGER))
             )
             ->set(
                 'has_indexing_properties',
-                $queryBuilder->createNamedParameter($hasIndexingPropertiesFlag, PDO::PARAM_INT),
+                $queryBuilder->createNamedParameter($hasIndexingPropertiesFlag, \Doctrine\DBAL\ParameterType::INTEGER),
                 false
             )->executeStatement();
     }

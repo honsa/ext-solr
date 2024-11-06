@@ -27,8 +27,6 @@ use TYPO3\CMS\Reports\Status;
 /**
  * Provides a status report about which schema version is used and checks
  * whether it fits the recommended version shipping with the extension.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class SchemaStatus extends AbstractSolrStatus
 {
@@ -41,7 +39,7 @@ class SchemaStatus extends AbstractSolrStatus
      *
      * Must be updated when changing the schema.
      */
-    public const RECOMMENDED_SCHEMA_VERSION = 'tx_solr-12-0-0--20230602';
+    public const RECOMMENDED_SCHEMA_VERSION = 'tx_solr-13-0-0--20240513';
 
     /**
      * Compiles a collection of schema version checks against each configured

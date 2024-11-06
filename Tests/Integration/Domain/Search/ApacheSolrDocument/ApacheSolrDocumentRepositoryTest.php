@@ -18,6 +18,7 @@ namespace ApacheSolrForTypo3\Solr\Tests\Integration\Domain\Search\ApacheSolrDocu
 use ApacheSolrForTypo3\Solr\Domain\Search\ApacheSolrDocument\Repository;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\Tests\Integration\IntegrationTestBase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ApacheSolrDocumentRepositoryTest extends IntegrationTestBase
@@ -44,15 +45,13 @@ class ApacheSolrDocumentRepositoryTest extends IntegrationTestBase
      */
     protected function tearDown(): void
     {
-        $this->cleanUpSolrServerAndAssertEmpty();
+        $this->cleanUpAllCoresOnSolrServerAndAssertEmpty();
         unset($this->apacheSolrDocumentRepository);
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function canFindByPageIdAndByLanguageId()
+    #[Test]
+    public function canFindByPageIdAndByLanguageId(): void
     {
         $apacheSolrDocumentsCollection = $this->apacheSolrDocumentRepository->findByPageIdAndByLanguageId(3, 0);
 
@@ -61,10 +60,8 @@ class ApacheSolrDocumentRepositoryTest extends IntegrationTestBase
         self::assertInstanceOf(Document::class, $apacheSolrDocumentsCollection[0], 'ApacheSolrDocumentRepository returned not an array of type Document.');
     }
 
-    /**
-     * @test
-     */
-    public function canReturnEmptyCollectionIfNoConnectionToSolrServerIsEstablished()
+    #[Test]
+    public function canReturnEmptyCollectionIfNoConnectionToSolrServerIsEstablished(): void
     {
         $apacheSolrDocumentsCollection = $this->apacheSolrDocumentRepository->findByPageIdAndByLanguageId(3, 777);
         self::assertEmpty($apacheSolrDocumentsCollection, 'ApacheSolrDocumentRepository does not return empty collection if no connection to core can be established.');

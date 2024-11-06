@@ -21,27 +21,34 @@ use ApacheSolrForTypo3\Solr\Domain\Search\ApacheSolrDocument\Builder;
 use ApacheSolrForTypo3\Solr\Event\Indexing\AfterPageDocumentIsCreatedForIndexingEvent;
 use ApacheSolrForTypo3\Solr\Event\Indexing\BeforeDocumentsAreIndexedEvent;
 use ApacheSolrForTypo3\Solr\Event\Indexing\BeforePageDocumentIsProcessedForIndexingEvent;
-use ApacheSolrForTypo3\Solr\Exception;
+use ApacheSolrForTypo3\Solr\Exception as SolrException;
 use ApacheSolrForTypo3\Solr\FieldProcessor\Service;
 use ApacheSolrForTypo3\Solr\IndexQueue\Item;
 use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerRequest;
 use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerResponse;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
+use ApacheSolrForTypo3\Solr\NoSolrConnectionFoundException;
 use ApacheSolrForTypo3\Solr\System\Configuration\TypoScriptConfiguration;
 use ApacheSolrForTypo3\Solr\System\Logging\DebugWriter;
 use ApacheSolrForTypo3\Solr\System\Logging\SolrLogManager;
 use ApacheSolrForTypo3\Solr\System\Solr\Document\Document;
 use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 use ApacheSolrForTypo3\Solr\Util;
+use Doctrine\DBAL\Exception as DBALException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use Throwable;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
+use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Event\AfterCacheableContentIsGeneratedEvent;
+use TYPO3\CMS\Frontend\Page\PageInformation;
 use UnexpectedValueException;
 
 /**
@@ -49,17 +56,17 @@ use UnexpectedValueException;
  * should be used by the Index Queue.
  *
  * Once the FrontendHelper construct is separated, this will be a standalone Indexer.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexer implements FrontendHelper, SingletonInterface
 {
+    public const ACTION_NAME = 'indexPage';
+
     protected bool $activated = false;
 
     /**
      * This frontend helper's executed action.
      */
-    protected string $action = 'indexPage';
+    protected string $action = self::ACTION_NAME;
 
     /**
      * Index Queue page indexer request.
@@ -121,14 +128,14 @@ class PageIndexer implements FrontendHelper, SingletonInterface
      * Generates the current page's URL as string.
      * Uses the provided parameters from TSFE, page id and language id.
      */
-    protected function generatePageUrl(TypoScriptFrontendController $controller): string
+    protected function generatePageUrl(PageArguments $pageArguments, PageInformation $pageInformation, TypoScriptFrontendController $controller): string
     {
         if ($this->request?->getParameter('overridePageUrl')) {
             return $this->request->getParameter('overridePageUrl');
         }
 
-        $parameter = $controller->page['uid'];
-        $type = $controller->getPageArguments()->getPageType();
+        $parameter = $pageInformation->getPageRecord()['uid'];
+        $type = $pageArguments->getPageType();
         if ($type && MathUtility::canBeInterpretedAsInteger($type)) {
             $parameter .= ',' . $type;
         }
@@ -141,6 +148,7 @@ class PageIndexer implements FrontendHelper, SingletonInterface
     /**
      * Handles the indexing of the page content during AfterCacheableContentIsGeneratedEvent of a generated page.
      */
+    #[AsEventListener]
     public function __invoke(AfterCacheableContentIsGeneratedEvent $event): void
     {
         $this->request = $event->getRequest()->getAttribute('solr.pageIndexingInstructions');
@@ -149,6 +157,9 @@ class PageIndexer implements FrontendHelper, SingletonInterface
             return;
         }
         $this->setupConfiguration();
+
+        $typo3Request = $event->getRequest();
+        $GLOBALS['TYPO3_REQUEST'] = $typo3Request;
         $tsfe = $event->getController();
 
         $logPageIndexed = $this->configuration->getLoggingIndexingPageIndexed();
@@ -166,7 +177,7 @@ class PageIndexer implements FrontendHelper, SingletonInterface
             if ($indexQueueItem === null) {
                 throw new UnexpectedValueException('Can not get index queue item', 1482162337);
             }
-            $this->index($indexQueueItem, $tsfe);
+            $this->index($indexQueueItem, $typo3Request, $tsfe);
         } catch (Throwable $e) {
             $this->responseData['pageIndexed'] = false;
             if ($this->configuration->getLoggingExceptions()) {
@@ -193,19 +204,43 @@ class PageIndexer implements FrontendHelper, SingletonInterface
 
     /**
      * Index item
+     *
+     * @throws DBALException
+     * @throws SolrException
+     * @throws Throwable
      */
-    protected function index(Item $indexQueueItem, TypoScriptFrontendController $tsfe): void
-    {
-        $this->solrConnection = $this->getSolrConnection($indexQueueItem, $tsfe->getLanguage(), $this->configuration->getLoggingExceptions());
+    protected function index(
+        Item $indexQueueItem,
+        ServerRequestInterface $request,
+        TypoScriptFrontendController $tsfe,
+    ): void {
+        /** @var PageArguments $pageArguments */
+        $pageArguments = $request->getAttribute('routing');
+        $pageInformation = $request->getAttribute('frontend.page.information');
+        $siteLanguage = $request->getAttribute('language');
+        $this->solrConnection = $this->getSolrConnection($indexQueueItem, $siteLanguage, $this->configuration->getLoggingExceptions());
 
-        $document = $this->getPageDocument($tsfe, $this->generatePageUrl($tsfe), $this->getAccessRootline(), $tsfe->MP);
-        $document = $this->substitutePageDocument($document, $tsfe->page, $indexQueueItem, $tsfe);
+        $document = $this->getPageDocument(
+            $tsfe,
+            $pageInformation,
+            $pageArguments,
+            $siteLanguage,
+            $this->generatePageUrl($pageArguments, $pageInformation, $tsfe),
+            $this->getAccessRootline(),
+            $pageInformation->getMountPoint()
+        );
+        $document = $this->substitutePageDocument(
+            $document,
+            $pageInformation->getPageRecord(),
+            $indexQueueItem,
+            $tsfe,
+        );
 
         $this->responseData['pageIndexed'] = (int)$this->indexPage($document, $indexQueueItem, $tsfe);
         $this->responseData['originalPageDocument'] = (array)$document;
         $this->responseData['solrConnection'] = [
             'rootPage' => $indexQueueItem->getRootPageUid(),
-            'sys_language_uid' => $tsfe->getLanguage()->getLanguageId(),
+            'sys_language_uid' => $siteLanguage->getLanguageId(),
             'solr' => $this->solrConnection->getEndpoint('write')->getCoreBaseUri(),
         ];
 
@@ -217,6 +252,11 @@ class PageIndexer implements FrontendHelper, SingletonInterface
     /**
      * Gets the solr connection to use for indexing the page based on the
      * Index Queue item's properties.
+     *
+     * @throws DBALException
+     * @throws NoSolrConnectionFoundException
+     * @throws SolrException
+     * @throws Throwable
      */
     protected function getSolrConnection(Item $indexQueueItem, SiteLanguage $siteLanguage, bool $logExceptions): SolrConnection
     {
@@ -224,7 +264,7 @@ class PageIndexer implements FrontendHelper, SingletonInterface
         try {
             $solrConnection = $connectionManager->getConnectionByRootPageId($indexQueueItem->getRootPageUid(), $siteLanguage->getLanguageId());
             if (!$solrConnection->getWriteService()->ping()) {
-                throw new Exception(
+                throw new SolrException(
                     'Could not connect to Solr server.',
                     1323946472
                 );
@@ -250,9 +290,12 @@ class PageIndexer implements FrontendHelper, SingletonInterface
 
     /**
      * This method retrieves the item from the index queue, that is indexed in this request.
+     *
+     * @throws DBALException
      */
     protected function getIndexQueueItem(): ?Item
     {
+        /** @var Queue $indexQueue */
         $indexQueue = GeneralUtility::makeInstance(Queue::class);
         return $indexQueue->getItem($this->request->getParameter('item'));
     }
@@ -270,7 +313,13 @@ class PageIndexer implements FrontendHelper, SingletonInterface
         Item $indexQueueItem,
         TypoScriptFrontendController $tsfe,
     ): Document {
-        $event = new AfterPageDocumentIsCreatedForIndexingEvent($pageDocument, $indexQueueItem, $pageRecord, $tsfe, $this->configuration);
+        $event = new AfterPageDocumentIsCreatedForIndexingEvent(
+            $pageDocument,
+            $indexQueueItem,
+            $pageRecord,
+            $tsfe,
+            $this->configuration,
+        );
         $event = $this->getEventDispatcher()->dispatch($event);
         return $event->getDocument();
     }
@@ -280,16 +329,19 @@ class PageIndexer implements FrontendHelper, SingletonInterface
      *
      * @return Document A document representing the page
      */
-    protected function getPageDocument(TypoScriptFrontendController $tsfe, string $url, Rootline $pageAccessRootline, string $mountPointParameter): Document
+    protected function getPageDocument(TypoScriptFrontendController $tsfe, PageInformation $pageInformation, PageArguments $pageArguments, SiteLanguage $siteLanguage, string $url, Rootline $pageAccessRootline, string $mountPointParameter): Document
     {
         $documentBuilder = GeneralUtility::makeInstance(Builder::class);
-        return $documentBuilder->fromPage($tsfe, $url, $pageAccessRootline, $mountPointParameter);
+        return $documentBuilder->fromPage($pageInformation, $pageArguments, $siteLanguage, $tsfe, $url, $pageAccessRootline, $mountPointParameter);
     }
 
     /**
      * Indexes a page.
      *
      * @return bool TRUE after successfully indexing the page, FALSE on error
+     *
+     * @throws DBALException
+     * @throws SolrException
      */
     protected function indexPage(
         Document $pageDocument,
@@ -317,6 +369,9 @@ class PageIndexer implements FrontendHelper, SingletonInterface
      * care of manipulating fields as defined in the field's configuration.
      *
      * @param Document[] $documents An array of documents to manipulate
+     *
+     * @throws SolrException
+     * @throws DBALException
      */
     protected function processDocuments(array $documents): void
     {
@@ -350,7 +405,7 @@ class PageIndexer implements FrontendHelper, SingletonInterface
                 $response = $this->solrConnection->getWriteService()->addDocuments($documentChunk);
                 if ($response->getHttpStatus() != 200) {
                     $this->logger->error('Solr could not index page.', [$response->getRawResponse()]);
-                    throw new \RuntimeException('Solr Request failed.', 1331834983);
+                    throw new RuntimeException('Solr Request failed.', 1331834983);
                 }
             }
 

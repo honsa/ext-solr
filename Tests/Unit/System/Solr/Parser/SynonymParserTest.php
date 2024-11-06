@@ -17,18 +17,15 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\System\Solr\Parser;
 
 use ApacheSolrForTypo3\Solr\System\Solr\Parser\SynonymParser;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Testcase for StopWordParser
- *
- * @author Timo Hund <timo.hund@dkd.de>
  */
 class SynonymParserTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function canParseSynonyms()
+    #[Test]
+    public function canParseSynonyms(): void
     {
         $parser = new SynonymParser();
         $synonyms = $parser->parseJson('foo', self::getFixtureContentByName('synonym.json'));

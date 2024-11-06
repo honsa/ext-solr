@@ -17,15 +17,10 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\Domain\Search\Score;
 
 use ApacheSolrForTypo3\Solr\Domain\Search\Score\ScoreCalculationService;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @author Timo Schmidt <timo.schmidt@dkd.de>
- */
 class ScoreCalculationServiceTest extends SetUpUnitTestCase
 {
-    /**
-     * @var ScoreCalculationService
-     */
     protected ScoreCalculationService $scoreCalculationService;
 
     protected function setUp(): void
@@ -34,10 +29,8 @@ class ScoreCalculationServiceTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canGetRenderedScoreAnalysis()
+    #[Test]
+    public function canGetRenderedScoreAnalysis(): void
     {
         $fakeDebugData = self::getFixtureContentByName('fakeSolrDebugData.txt');
         $fakeQueryFields = 'content^40.0, title^5.0, keywords^2.0, tagsH1^5.0, tagsH2H3^3.0, tagsH4H5H6^2.0, tagsInline^1.0, description^4.0, abstract^1.0, subtitle^1.0, navtitle^1.0, author^1.0';

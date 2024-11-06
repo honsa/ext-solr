@@ -17,18 +17,14 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\FieldProcessor;
 
 use ApacheSolrForTypo3\Solr\FieldProcessor\PathToHierarchy;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * tests the path to hierarchy processing
- *
- * @author    Daniel Pötzinger <poetzinger@aoemedia.de>
  */
 class PathToHierarchyTest extends SetUpUnitTestCase
 {
-    /**
-     * @var PathToHierarchy
-     */
-    protected $processor;
+    protected PathToHierarchy $processor;
 
     protected function setUp(): void
     {
@@ -36,10 +32,8 @@ class PathToHierarchyTest extends SetUpUnitTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
-    public function canBuildSolrHierarchyString()
+    #[Test]
+    public function canBuildSolrHierarchyString(): void
     {
         self::assertEquals(
             $this->processor->process(['sport/cricket']),

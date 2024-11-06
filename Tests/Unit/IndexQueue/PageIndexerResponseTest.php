@@ -19,19 +19,16 @@ namespace ApacheSolrForTypo3\Solr\Tests\Unit\IndexQueue;
 
 use ApacheSolrForTypo3\Solr\IndexQueue\PageIndexerResponse;
 use ApacheSolrForTypo3\Solr\Tests\Unit\SetUpUnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Index Queue Page Indexer response test.
- *
- * @author Ingo Renner <ingo@typo3.org>
  */
 class PageIndexerResponseTest extends SetUpUnitTestCase
 {
-    /**
-     * @test
-     */
-    public function getResultReturnsSingleResult()
+    #[Test]
+    public function getResultReturnsSingleResult(): void
     {
         $action = 'testAction';
         $result = 'testResult';
@@ -42,10 +39,8 @@ class PageIndexerResponseTest extends SetUpUnitTestCase
         self::assertEquals($result, $request->getActionResult($action));
     }
 
-    /**
-     * @test
-     */
-    public function getResultReturnsAllResults()
+    #[Test]
+    public function getResultReturnsAllResults(): void
     {
         $request = GeneralUtility::makeInstance(PageIndexerResponse::class);
         $request->addActionResult('action1', 'result1');
