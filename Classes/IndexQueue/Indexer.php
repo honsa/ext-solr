@@ -387,7 +387,7 @@ class Indexer extends AbstractIndexer
             }
         }
         
-        if (!is_null($itemRecord)) {
+        if (!is_null($itemRecord) && $isVisible) {
             $itemIndexingConfiguration = $this->getItemTypeConfiguration($item, $language);
             $document = $this->getBaseDocument($item, $itemRecord);
             $tsfe = $this->getTsfeByItemAndLanguageId($item, $language);
