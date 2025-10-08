@@ -378,7 +378,7 @@ class Indexer extends AbstractIndexer
 
         $itemRecord = $this->getFullItemRecord($item, $language);
 
-        $isVisible = ((is_array($itemRecord) && empty($itemRecord['hidden'])));
+        $isVisible = ((is_array($itemRecord) && empty($itemRecord[$GLOBALS['TCA'][$item->getType()]['ctrl']['enablecolumns']['disabled']])));
 
         if (!is_null($itemRecord) && $isVisible) {
             $itemIndexingConfiguration = $this->getItemTypeConfiguration($item, $language);
