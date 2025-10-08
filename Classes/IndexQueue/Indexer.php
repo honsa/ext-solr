@@ -379,7 +379,7 @@ class Indexer extends AbstractIndexer
         $itemRecord = $this->getFullItemRecord($item, $language);
 
         $isVisible = ((is_array($itemRecord) && empty($itemRecord['hidden'])));
-        
+
         if (!is_null($itemRecord) && $isVisible) {
             $itemIndexingConfiguration = $this->getItemTypeConfiguration($item, $language);
             $document = $this->getBaseDocument($item, $itemRecord);
